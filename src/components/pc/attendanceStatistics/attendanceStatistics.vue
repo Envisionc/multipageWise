@@ -411,7 +411,11 @@ export default {
                         for (let i=1; i<obj.length; i++) {
                             body.push(obj[i])
                         }
-                        util.exportExcelOther(header,body, '人员考勤统计表格')
+                        if (obj.length == 0) {
+                            this.$message.error('数据是空的，不能执行导出操作')
+                        } else {
+                            util.exportExcelOther(header,body, '人员考勤统计表格')
+                        }
                     } else {
                         this.$message.error(res.data.message)
                     }

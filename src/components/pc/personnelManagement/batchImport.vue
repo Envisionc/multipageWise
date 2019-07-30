@@ -51,9 +51,9 @@
 <script>
 //   import api from "api/admin.js";
 import axios from 'axios'
-import uuid from '../../utils/common'
+import uuid from '../../../utils/common'
 import XLSX from 'xlsx'
-import util from '../../utils/excelUtil'
+import util from '../../../utils/excelUtil'
   export default {
     data() {
       return {

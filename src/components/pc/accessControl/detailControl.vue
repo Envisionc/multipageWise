@@ -12,7 +12,7 @@
                 <!-- :style="{display:isFocus?'block':'none'}" -->
                 <div class="search-list" :style="{display:isFocus?'block':'none'}">
                     <div class="search-list-item" v-for="(item,index) in modalList" :key="index" @click="addAdmin(item)">
-                        <img src="@/assets/person-icon.png" class="per-ico" />
+                        <img src="@/assets/img/person-icon.png" class="per-ico" />
                         {{item.name}} -
                         <span>{{item.personNo}}</span>
                         <i class="el-icon-check" v-if="item.checked"></i> 
@@ -55,7 +55,7 @@
 
 <script>
 import axios from 'axios'
-import uuid from '../../utils/common'
+import uuid from '../../../utils/common'
 export default {
     data () {
         return {

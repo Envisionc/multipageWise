@@ -18,7 +18,7 @@ export default {
   },
   mounted () {
     console.log(location.hash.substring(1))
-    // this.activeIndex = location.hash.substring(1)
+    this.activeIndex = location.hash.substring(1)
     // console.log(this.activeIndex)
   },
   methods: {

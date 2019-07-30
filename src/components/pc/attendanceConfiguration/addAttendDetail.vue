@@ -95,9 +95,9 @@
 </template>
 <script>
   // import api from "@/api/attendance.js"
-  import DateUtil from '../../utils/DateUtil'
+  import DateUtil from '../../../utils/DateUtil'
 import axios from "axios"
-import uuid from "../../utils/common"
+import uuid from "../../../utils/common"
   const weekMap = {
     1: "周一",
     2: "周二",

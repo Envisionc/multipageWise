@@ -150,9 +150,8 @@
 <script>
   // import api from "../../api/person";
 import axios from 'axios'
-import lefttree from '../component/left-tree'
-import uuid from '../../utils/common'
-import {cityList, hotCity,nationList} from '../../severs/city'
+import uuid from '../../../utils/common'
+import {cityList, hotCity,nationList} from '../../../api/pc/city'
   export default {
     mounted() {
     },
@@ -275,9 +274,6 @@ import {cityList, hotCity,nationList} from '../../severs/city'
         selectMonthYear: '', //入学年月
         orgOptions: []
       }
-    },
-    components: {
-      lefttree
     },
     created() {
       if (!this.$route.query.id) {
@@ -467,7 +463,7 @@ import {cityList, hotCity,nationList} from '../../severs/city'
             }
           })
         } else {
-          let orgId = Number(node.data.orgId)
+          let orgId = node.data.orgId
           const token = window.localStorage.getItem("token")
           let requestId = uuid.createUUID()
           let params = {

@@ -71,8 +71,8 @@
 <script>
 //   import api from "api/admin.js";
 import axios from 'axios'
-import lefttree from '../component/left-tree'
-import uuid from '../../utils/common'
+// import lefttree from '../component/left-tree'
+import uuid from '../../../utils/common'
   export default {
     data() {
       return {
@@ -98,9 +98,6 @@ import uuid from '../../utils/common'
         expandedKeys: [],
         requestId: ''
       }
-    },
-    components: {
-      lefttree
     },
     created() {
       if (!this.$route.query.id) {
@@ -205,7 +202,7 @@ import uuid from '../../utils/common'
             }
           })
         } else {
-          let orgId = Number(node.data.orgId)
+          let orgId = node.data.orgId
           const token = window.localStorage.getItem("token")
           let requestId = uuid.createUUID()
           let params = {

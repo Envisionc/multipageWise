@@ -73,7 +73,7 @@
   // import api from "@/api/attendance.js";
 //   import YHeader from './component/yHeader.vue'
 import axios from 'axios'
-import uuid from '../../utils/common'
+import uuid from '../../../utils/common'
 const weekMap = {
     1: "周一",
     2: "周二",
@@ -87,26 +87,7 @@ const weekMap = {
     data() {
       return {
         tableData: [],
-        table_data: [
-            {
-                name: '学生考勤',
-                id: "1",
-                state: '启用',
-                attendence: '周一,周二,周三,周四,周五'
-            },
-            {
-                name: '教师考勤',
-                id: "2",
-                state: '启用',
-                attendence: '周一,周二,周三,周四,周五'
-            },
-            {
-                name: '学生夏季考勤',
-                id: "3",
-                state: '关闭',
-                attendence: '周一,周二,周三,周四,周五,周六'
-            },
-        ],
+        table_data: [],
         dialogTableVisible: false,
         gridData: [
           {

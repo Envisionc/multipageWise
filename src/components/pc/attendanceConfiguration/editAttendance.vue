@@ -155,9 +155,9 @@
 //   import uuid from 'node-uuid'
 //   import YHeader from './component/yHeader'
   import selectPersonDlg from '../component/selectPersonDlg'
-  import DateUtil from '../../utils/DateUtil'
+  import DateUtil from '../../../utils/DateUtil'
 import axios from "axios"
-import uuid from "../../utils/common"
+import uuid from "../../../utils/common"
   const weekMap2 = {"周一": 1, "周二": 2, "周三": 3, "周四": 4, "周五": 5, "周六": 6, "周日": 7}
 
   const weekMap = {

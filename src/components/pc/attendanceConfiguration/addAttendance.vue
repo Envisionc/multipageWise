@@ -157,8 +157,8 @@
   import axios from 'axios'
   import selectPersonDlg from '../component/selectPersonDlg'
 //   import YHeader from './component/yHeader.vue'
-  import DateUtil from '../../utils/DateUtil'
-  import uuid from '@/utils/common'
+  import DateUtil from '../../../utils/DateUtil'
+  import uuid from '../../../utils/common'
 
 
   export default {

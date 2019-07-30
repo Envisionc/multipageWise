@@ -8,10 +8,17 @@ Vue.use(Router)
 let router = new Router({
   routes: [
     {
-      path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
-    }
+      path: '/mobile_attendance',
+      redirect: '/attendanceInfo'
+    },
+    // 考勤信息显示
+    {
+      path: '/attendanceInfo',
+      meta: {
+        title: '考勤信息显示'
+      },
+      component: () => import("../../components/mobile/home")
+    },
   ]
 })
 

@@ -42,7 +42,7 @@
 
 <script>
 import axios from "axios"
-import uuid from '../../utils/common'
+import uuid from '../../../utils/common'
 export default {
     data () {
         return {

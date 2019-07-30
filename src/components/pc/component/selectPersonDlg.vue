@@ -62,7 +62,7 @@
 <script>
   // import api from '@/api/attendance.js'
 import axios from "axios"
-import uuid from "../../utils/common"
+import uuid from "../../../utils/common"
   export default {
     name: 'select-person-dlg',
     props: ["tmpSelectPerson"],
@@ -156,7 +156,7 @@ import uuid from "../../utils/common"
             }
           })
         } else {
-          let orgId = Number(node.data.orgId)
+          let orgId = node.data.orgId
           const token = window.localStorage.getItem("token")
           let requestId = uuid.createUUID()
           let params = {
