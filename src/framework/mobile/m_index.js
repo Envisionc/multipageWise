@@ -6,6 +6,8 @@ import router from '../../router/mobile/index'
 import Element from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import '../../css/common.css'
+import VueScroller from 'vue-scroller'
+Vue.use(VueScroller)
 
 Vue.config.productionTip = false
 Vue.use(Element)

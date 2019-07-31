@@ -11,13 +11,27 @@ let router = new Router({
       path: '/mobile_attendance',
       redirect: '/attendanceInfo'
     },
-    // 考勤信息显示
+    // 考勤信息显示-首页
     {
       path: '/attendanceInfo',
       meta: {
         title: '考勤信息显示'
       },
       component: () => import("../../components/mobile/home")
+    },
+    {
+      path: '/attendanceInfo/statisDetail',
+      meta: {
+        title: '考勤信息列表'
+      },
+      component: () => import("../../components/mobile/statisDetail")
+    },
+    {
+      path: '/attendance/information',
+      meta: {
+        title: '查看详情'
+      },
+      component: () => import("../../components/mobile/information")
     },
   ]
 })

@@ -13,8 +13,8 @@
 </template>
 
 <script>
-  // import api from '../../api/admin.js'
-
+import api from '../../../api/mobile/index'
+import uuid from '../../../utils/common'
   export default {
     props: {
       classShow: {
@@ -24,7 +24,30 @@
     },
     data() {
       return {
-        classList: [],
+        classList: [
+          {
+            name: "小学部",
+            orgId: "106722",
+            subOrg: [
+              {
+                name: "一年级",
+                orgId: "1067222552",
+                subOrg: [
+                  {
+                    name: "一(1)班",
+                    orgId: "10622552562",
+                    subOrg: []
+                  },
+                  {
+                    name: "一(2)班",
+                    orgId: "10622552563",
+                    subOrg: []
+                  }
+                ]
+              }
+            ]
+          }
+        ],
         division: [],
         grade: [],
         classArr: [],
@@ -82,9 +105,27 @@
           this.className = item.name;
         }
         this.classList = new_arr;
-        $('.class-select-area').width(240 * new_arr.length)
+        // $('.class-select-area').width(200 * new_arr.length)
       },  
       getClassTree(){
+        let requestId = uuid.createUUID()
+        let token = window.localStorage.getItem("token")
+        let params = {
+          "requestId": requestId,
+          "authToken": token,
+          "userToken": token,
+          "data": {}
+        }
+        api.getAllOrg(params).then(res => {
+          console.log(res.data[0])
+          if (res.code == 0) {
+            this.classTree = res.data[0].subOrg
+            // this.classTree = this.classList
+            this.setClassTree()
+          } else {
+            this.$message.error(res.message)
+          }
+        })
         // api.allOrg().then(data => {
         //   if (data.code == 0) {
         //     this.classTree = data.data[0].subOrg;
@@ -103,54 +144,66 @@
 
 <style scope>
 .class-select {
-  overflow-x: auto;
+  width: 100%;
+  height: 400px;
+  background: #FCFCFC;
+  /* overflow-x: auto; */
+  position: fixed;
+  top: 72px;
+  left: 0;
+  z-index: 99;
 }
 .class-select-area{
-  height: 100%;
+  width: 100%;
+  height: 352px;
 }
 .class-select-item{
   float: left;
-  padding-left: 32px;
-  padding-right: 32px;
-  padding-bottom: 112px;
+  padding-left: 16px;
+  padding-right: 16px;
+  /* padding-bottom: 112px; */
   overflow-y: auto;
-  width: 240px;
+  width: 33%;
   height: 100%;
   border-right: 1px solid #eee;
 }
 .class-select-item p {
-  border-bottom: 1px solid #eee;
+  height: 30px;
+  line-height: 30px;
+  /* border-bottom: 1px solid #eee; */
 }
 
 .class-select-item:last-child{
   /*border-right: 0;*/
 }
 .class-select-btn{
-  position: fixed;
   width: 100%;
-  height: 96px;
+  height: 48px;
+  font-size: 14px;
   background-color: #fff;
-  bottom: 0;
-  left: 0;
-  z-index: 4;
-  border-top: 1px solid #e1e1e1;
+  /* border-top: 1px solid #e1e1e1; */
 }
 .class-select-btn div{
   width: 50%;
   float: left;
   text-align: center;
-  line-height: 96px;
+  line-height: 48px;
+  border: 1px solid #797979;
 }
-.confirm-btn{
-  background-color: #50bfff;
-  color: #fff;
-  border-left: 1px solid #e1e1e1;
+.class-select-btn .confirm-btn{
+  /* background-color: #50bfff; */
+  background-color: #5CB85C;
+  color: #333;
+  /* border-left: 1px solid #e1e1e1; */
+  border-left: none;
 }
 .class-select-item .active{
   color: #50bfff;
-  font-weight: bold;
+  /* font-weight: bold; */
 }
 .class-select-item p{
-  margin-top: 28.8px;
+  width: 140px;
+  font-size: 14px;
+  /* margin-top: 28.8px; */
 }
 </style>

@@ -24,7 +24,8 @@
                 </el-select>
               </div>
               <div class="index-class"  @click="changeClassShow()" style="width: 155.2px;">
-                {{selectClassName ? selectClassName: '选择班级'}}<i class="el-icon-arrow-up" v-if="classShow"></i><i class="el-icon-arrow-down" v-else></i>
+                {{selectClassName ? selectClassName: '选择班级'}}
+                <!-- <i class="el-icon-arrow-up" v-if="classShow"></i><i class="el-icon-arrow-down" v-else></i> -->
               </div>
             </div>
             <div class="clearfix gate-line">
@@ -37,39 +38,40 @@
                 <div class="statis-line">
                   <span class="statis-name">迟到</span>
                   <span class="statis-num">{{gateSummary.comeLate}}</span>
-                  <span class="statis-link" ><i class="el-icon-d-arrow-right"></i></span>
+                  <span class="statis-link" @click="linkToStasticDetail(1)"><span>详情</span><i class="el-icon-d-arrow-right"></i></span>
                 </div>
                 <div class="statis-line">
                   <span class="statis-name">早退</span>
                   <span class="statis-num">{{gateSummary.leftEarly}}</span>
-                  <span class="statis-link" ><i class="el-icon-d-arrow-right"></i></span>
+                  <span class="statis-link" @click="linkToStasticDetail(2)"><span>详情</span><i class="el-icon-d-arrow-right"></i></span>
                 </div>
                 <div class="statis-line">
                   <span class="statis-name">旷课</span>
                   <span class="statis-num">{{gateSummary.absentee}}</span>
-                  <span class="statis-link" ><i class="el-icon-d-arrow-right"></i></span>
+                  <span class="statis-link" @click="linkToStasticDetail(5)"><span>详情</span><i class="el-icon-d-arrow-right"></i></span>
                 </div>
                 <div class="statis-line">
                   <span class="statis-name">异常</span>
                   <span class="statis-num">{{gateSummary.abnormal}}</span>
-                  <span class="statis-link" ><i class="el-icon-d-arrow-right"></i></span>
+                  <span class="statis-link" @click="linkToStasticDetail(4)"><span>详情</span><i class="el-icon-d-arrow-right"></i></span>
                 </div>
                 <div class="statis-line"><span class="statis-name">晚未出</span>
                   <span class="statis-num">{{gateSummary.notLeave}}</span>
-                  <span class="statis-link" ><i class="el-icon-d-arrow-right"></i></span>
+                  <span class="statis-link" @click="linkToStasticDetail(6)"><span>详情</span><i class="el-icon-d-arrow-right"></i></span>
                 </div>
               </div>
             </div>
-            <p class="statis-all">校门考勤统计&nbsp;<span class="statis-link" >详情<i class="el-icon-d-arrow-right"></i></span></p>
+            <p class="statis-all">校门考勤统计&nbsp;<span class="statis-link-all" @click="linkToStasticDetail('')">详情<i class="el-icon-d-arrow-right"></i></span></p>
           </div>
         </div>
       </div>
-      <selectClass />
+      <selectClass :classShow="classShow" @doSelectClass="doSelectClass" />
     </div>
 </template>
 
 <script>
 import echarts from 'echarts'
+import DateUtil from '../../utils/DateUtil'
 import api from '../../api/mobile/index'
 import uuid from '../../utils/common'
 import selectClass from './component/selectClazz'
@@ -98,6 +100,15 @@ export default {
       selectClassName: '',
       classShow: false,
       gateSummary: {},
+      mockData: {
+        abnormal: 20,
+        absentee: 25,
+        comeLate: 30,
+        leftEarly: 15,
+        normal: 45,
+        notLeave: 30,
+        total: 1650
+      }
     }
   },
   components: {
@@ -111,7 +122,7 @@ export default {
   },
   methods: {
     updateData() {
-
+      this.getGateSummary()
     },
     getGateSummary() {
       let requestId = uuid.createUUID()
@@ -125,41 +136,29 @@ export default {
       api.gateSummary(params).then(res => {
         if (res.code == 0) {
           console.log(res.data, "f返回的结果")
-          this.gateSummary = res.data
+          // this.gateSummary = res.data
+          this.gateSummary = this.mockData
           let myChart = echarts.init(document.getElementById('gate-charts'))
           myChart.setOption(this.getOptions(
             ['迟到', "早退", "旷课", '晚未出'],
-            [res.data.comeLate, res.data.leftEarly, res.data.absentee, res.data.notLeave]
+            [this.mockData.comeLate, this.mockData.leftEarly, this.mockData.absentee,this.mockData.abnormal, this.mockData.notLeave]
           ))
         } else {
           this.$message.error(res.message)
           
         }
       })
-      // api.gateSummary(param).then(data => {
-      //   if (data.code == 0) {
-      //     this.gateSummary = data.data;
-      //     let myChart = echarts.init(document.getElementById('gate-charts'))
-      //     myChart.setOption(this.getOptions(
-      //       ['迟到', "早退", "旷课", '晚未出'],
-      //       [data.data.comeLate, data.data.leftEarly, data.data.absentee, data.data.notLeave]
-      //     ))
-      //   } else {
-      //     this.$message.error(data.message);
-      //   }
-
-      // });
     },
     getOptions(head, data) {
       let _data = [];
       let color = ['94bdb1', '956151', 'e1bf98', 'acc7d9', 'ecdedc', 'e1bf98']
       for (let item of data) {
         _data.push({
-              value: item,
-              itemStyle: {
-                color: '#'+color[Math.floor(Math.random() * color.length)]
-              }
-            })
+          value: item,
+          itemStyle: {
+            color: '#'+color[Math.floor(Math.random() * color.length)]
+          }
+        })
       }
       return {
         // color: ['#b55b56','#54616c','#81a7ac'],
@@ -176,25 +175,37 @@ export default {
             bottom: '10%',
         },
         yAxis : [
-            {
-                type : 'value',
-                minInterval: 1
-            }
+          {
+            type : 'category',
+            data : ['迟到','早退','旷课','异常','晚未出']
+          }
         ],
         xAxis : [
-            {
-                type : 'category',
-                data : head,
-                axisTick: {
-                    alignWithLabel: true
-                },
-                axisLabel: {
-                  margin: 7,
-                  fontSize: 11,
-                  interval: 0
-                }
-            }
+          {
+            type : 'value',
+            boundaryGap : [0, 0.01]
+          }
         ],
+        // yAxis : [
+        //     {
+        //         type : 'value',
+        //         minInterval: 1
+        //     }
+        // ],
+        // xAxis : [
+        //     {
+        //         type : 'category',
+        //         data : head,
+        //         axisTick: {
+        //             alignWithLabel: true
+        //         },
+        //         axisLabel: {
+        //           margin: 7,
+        //           fontSize: 11,
+        //           interval: 0
+        //         }
+        //     }
+        // ],
         series : [
             {
                 type:'bar',
@@ -203,6 +214,19 @@ export default {
             }
         ]
       }
+    },
+    doSelectClass(orgId, className) {
+      this.orgId = orgId
+      this.selectClassName = className
+      this.classShow = false
+      this.updateData()
+    },
+    linkToStasticDetail(type) {
+      let param = this.getParam();
+      if (type !== '') {
+        param.type = type
+      }
+      this.$router.push({path: '/attendanceInfo/statisDetail', query: param});
     },
     getParam() {
       let param = {
@@ -215,13 +239,6 @@ export default {
         param.dormId = this.floorId
       }
       return param
-    },
-    linkToStasticDetail(type) {
-      let param = this.getParam();
-      if (type !== '') {
-        param.type = type
-      }
-      this.$router.push({path: '/attendance/statisDetail', query: param});
     },
     changeClassShow() {
       this.classShow = this.classShow ? false : true
@@ -260,30 +277,40 @@ export default {
   font-size: 22.4px;
 }
 .statis-charts{
-  width: 320px;
-  height: 288px;
+  /* flex: 1; */
+  width: 170px;
+  height: 200px;
   float: left;
 }
 .statis-detail{
   float: left;
-  margin-left: 24px;
-  padding-top: 48px;
+  margin-left: 8px;
+  padding-top: 8px;
 }
 .statis-line{
+  display: flex;
+  line-height: 28px;
   margin-bottom: 4.8px;
 }
 .statis-name{
-  width: 88px;
+  width: 60px;
+  font-size: 14px;
   display: inline-block;
 }
 .statis-link{
-  color: #50bfff;
+  font-size: 14px;
+  color: #5CB85C;
+  /* color: #50bfff; */
   font-weight: bold;
   /*margin-left: 16px;*/
 }
+.statis-link-all {
+  font-size: 18px;
+  color: #5CB85C;
+}
 .statis-link .el-icon-d-arrow-right{
   margin-left: 9.6px;
-  font-size: 24px;
+  font-size: 14px;
   font-weight: bold;
 }
 .statis-all{
@@ -291,7 +318,7 @@ export default {
   text-align: center;
 }
 .class-statistical{
-  margin: 16px auto 48px;
+  margin: 0px auto 48px;
 }
 html,body{
   background-color: #fff!important;
@@ -326,6 +353,9 @@ html,body{
 .tab-content .index-timmer .el-input__inner{
   padding: 0 6.4px;
 }
+.el-input--suffix .el-input__inner {
+  padding-right: 10px;
+}
 .tab-content .index-state{
   margin-left: 16px;
   width: 120px;
@@ -333,11 +363,17 @@ html,body{
 }
 .tab-content .index-state .el-input--suffix .el-input__inner{
   padding: 0 6.4px;
+  padding-right: 10px;
   font-size: 19.2px;
 }
 .tab-content .index-class{
+  box-sizing: border-box;
+  height: 40px;
+  line-height: 40px;
+  border: 1px solid #333;
+  border-radius: 10px;
   margin-left: 9.6px;
-  font-size: 19.2px;
+  font-size: 14px;
   padding: 0 4.8px;
 }
 .ph-index-tabs .el-tabs__item{
@@ -365,9 +401,12 @@ html,body{
 }
 .gate-line{
   margin-top: 15px;
+  background: #fafafa;
+  display: flex;
 }
 .statis-num{
   display: inline-block;
+  font-size: 14px;
   width: 48px;
 }
 .shadow-divide{
