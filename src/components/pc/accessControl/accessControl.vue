@@ -71,7 +71,7 @@ export default {
                 "data": {}
             }
             axios({
-                url: '/api/mde-person/campus/back/person/personOrgList',
+                url: '/mde-person/campus/back/person/personOrgList',
                 method: 'post',
                 data: params,
                 headers:{
@@ -111,7 +111,7 @@ export default {
                 }
             }
             axios({
-                url: '/api/mde-person/campus/back/person/authority/delete',
+                url: '/mde-person/campus/back/person/authority/delete',
                 method: 'post',
                 data: params,
                 headers:{

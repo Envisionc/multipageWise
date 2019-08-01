@@ -241,7 +241,7 @@
         if (this.loading) return 
         this.loading = true
         let requestId = uuid.createUUID()
-        let token = window.localStorage.getItem("token")
+        let token = window.localStorage.getItem("Token")
         let personType
         if (this.personType != 0) personType = this.personType
         let nameOrPersonNo = this.keyword

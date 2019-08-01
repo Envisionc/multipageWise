@@ -146,16 +146,11 @@
   </div>
 </template>
 <script>
-  // import api from "../../api/person";
-  // import FileSaver from 'file-saver'
-  // import XLSX from 'xlsx'
-//   import { exportExcel } from '../utils/excelUtil'
 import axios from 'axios'
 import uuid from '../../../utils/common'
-// import leftTree from '../component/left-tree'
+import api from '../../../api/pc/index'
 import XLSX from 'xlsx'
 import util from '../../../utils/excelUtil'
-// import personServer from '../../../severs/personServer'
   export default {
     data() {
       return {
@@ -317,24 +312,10 @@ import util from '../../../utils/excelUtil'
       // this.getPersonList()
       this.getTree()
       this.generateYearList()
+      // console.log(location.hostname, "location.hostname")
       // this.getInfo()
     },
     methods: {
-      getInfo() {
-        const token = window.localStorage.getItem("token")
-        let requestId = uuid.createUUID() 
-        let params = {
-          "requestId": requestId,
-          "authToken": token,
-          "userToken": token,
-          "data": {}
-        }
-        personServer.getPersonList(params).then(res => {
-          console.log(res, "res...........")
-        }).catch(error => {
-          console.log("catch")
-        })
-      },
       generateYearList() {
         let startYear = 2005
         let currentDate = new Date()
@@ -373,7 +354,7 @@ import util from '../../../utils/excelUtil'
           "data": {}
         }
         axios({
-          url:'/api/mde-person/campus/back/person/queryPage',
+          url:'/mde-person/campus/back/person/queryPage',
           method: 'post',
           data: params,
           headers:{
@@ -401,22 +382,32 @@ import util from '../../../utils/excelUtil'
           "userToken": token,
           "data": {}
         }
-        axios({
-          url: '/api/mde-person/campus/back/organization/queryAllOrg',
-          method: 'post',
-          data: params,
-          headers:{
-            'Content-Type':'application/json'
-          }	
-        }).then(res => {
-          if (res.data.code == 0) {
-            this.treeDatas = res.data.data
-            this.orgId = res.data.data[0].orgId
+        api.getTreeOrg(params).then(res => {
+          console.log(res, "getTreeOrg")
+          if (res.code == 0) {
+            this.treeDatas = res.data
+            this.orgId = res.data[0].orgId
             this.search(1)
           } else {
-            this.$message.error(res.data.message)
+            this.$message.error(res.message)
           }
         })
+        // axios({
+        //   url: '/mde-person/campus/back/organization/queryAllOrg',
+        //   method: 'post',
+        //   data: params,
+        //   headers:{
+        //     'Content-Type':'application/json'
+        //   }	
+        // }).then(res => {
+        //   if (res.data.code == 0) {
+        //     this.treeDatas = res.data.data
+        //     this.orgId = res.data.data[0].orgId
+        //     this.search(1)
+        //   } else {
+        //     this.$message.error(res.data.message)
+        //   }
+        // })
       },
       loadNode(node, resolve) {
         if (node.level === 0) {
@@ -428,23 +419,33 @@ import util from '../../../utils/excelUtil'
             "userToken": token,
             "data": {}
           }
-          axios({
-            url: '/api/mde-person/campus/back/organization/querySubOrg',
-            method: 'post',
-            data: params,
-            headers:{
-              'Content-Type':'application/json'
-            }	
-          }).then(res => {
-            if(res.data.code == 0){
-              resolve(res.data.data)
-              if(res.data.data.length > 0) {
-                this.orgId = res.data.data[0].orgId
+          api.querySubOrg(params).then(res => {
+            if(res.code == 0){
+              resolve(res.data)
+              if(res.data.length > 0) {
+                this.orgId = res.data[0].orgId
               }
             }else {
-              this.$message.error(res.data.messsage)
+              this.$message.error(res.messsage)
             }
           })
+          // axios({
+          //   url: '/mde-person/campus/back/organization/querySubOrg',
+          //   method: 'post',
+          //   data: params,
+          //   headers:{
+          //     'Content-Type':'application/json'
+          //   }	
+          // }).then(res => {
+          //   if(res.data.code == 0){
+          //     resolve(res.data.data)
+          //     if(res.data.data.length > 0) {
+          //       this.orgId = res.data.data[0].orgId
+          //     }
+          //   }else {
+          //     this.$message.error(res.data.messsage)
+          //   }
+          // })
         } else {
           let orgId = node.data.orgId
           const token = window.localStorage.getItem("token")
@@ -457,20 +458,28 @@ import util from '../../../utils/excelUtil'
               "orgId": orgId
             }
           }
-          axios({
-            url: '/api/mde-person/campus/back/organization/querySubOrg',
-            method: 'post',
-            data: params,
-            headers:{
-              'Content-Type':'application/json'
-            }	
-          }).then(res => {
-              if (res.data.code == 0){
-                resolve(res.data.data);
-              } else {
-                this.$message.error(res.data.messsage)
-              }
+          api.querySubOrg(params).then(res => {
+            if(res.code == 0){
+              resolve(res.data)
+            }else {
+              this.$message.error(res.messsage)
+            }
           })
+
+          // axios({
+          //   url: '/mde-person/campus/back/organization/querySubOrg',
+          //   method: 'post',
+          //   data: params,
+          //   headers:{
+          //     'Content-Type':'application/json'
+          //   }	
+          // }).then(res => {
+          //     if (res.data.code == 0){
+          //       resolve(res.data.data);
+          //     } else {
+          //       this.$message.error(res.data.messsage)
+          //     }
+          // })
         }
       },
       // {id: "3", personNo: "201804012003", name: "吼吼吼", type: 0, org: "二班"}
@@ -507,7 +516,7 @@ import util from '../../../utils/excelUtil'
         param.append('userToken',token);//通过append向form对象添加数据 
         param.append('userId',personId);//通过append向form对象添加数据
         axios({
-          url: '/api/mde-person/mde/img/upload',
+          url: '/mde-person/mde/img/upload',
           method: 'post',
           data: param,
           headers:{
@@ -541,6 +550,7 @@ import util from '../../../utils/excelUtil'
       },
       // 查询
       search(page){
+        console.log(axios.defaults.baseURL, "axios")
         let personType // 身份类型，0为其他，1为学生，2为教职工，3为访客，4为校友
         let entranceYear  // 入学年份
         let personNameOrPhone // 学号或手机号
@@ -570,23 +580,33 @@ import util from '../../../utils/excelUtil'
             "pageNo": pageNo
           } 
         }
-        axios({
-          url:'/api/mde-person/campus/back/person/queryPage',
-          method: 'post',
-          data: params,
-          headers:{
-            'Content-Type':'application/json'
-          }	
-        }).then(res => {
-          if (res.data.code == 0) {
+        api.getPersonList(params).then(res => {
+          if (res.code == 0) {
             console.log(res.data)
-            this.personList = res.data.data.list;
-            this.total = res.data.data.pageBean.rowCount;
-            this.pageSize = res.data.data.pageBean.maxResults
+            this.personList = res.data.list;
+            this.total = res.data.pageBean.rowCount;
+            this.pageSize = res.data.pageBean.maxResults
           } else {
-            this.$message.error(res.data.message)
+            this.$message.error(res.message)
           }
         })
+        // axios({
+        //   url:'/mde-person/campus/back/person/queryPage',
+        //   method: 'post',
+        //   data: params,
+        //   headers:{
+        //     'Content-Type':'application/json'
+        //   }	
+        // }).then(res => {
+        //   if (res.data.code == 0) {
+        //     console.log(res.data)
+        //     this.personList = res.data.data.list;
+        //     this.total = res.data.data.pageBean.rowCount;
+        //     this.pageSize = res.data.data.pageBean.maxResults
+        //   } else {
+        //     this.$message.error(res.data.message)
+        //   }
+        // })
         // api.personList(param).then(data => {
         //   if (data.code == 0){
             // this.exportTable = data.data.list;
@@ -610,7 +630,7 @@ import util from '../../../utils/excelUtil'
           }
         }
         axios({
-          url: '/api/mde-person/campus/back/exportPerson',
+          url: '/mde-person/campus/back/exportPerson',
           method: 'post',
           data: params,
           headers:{

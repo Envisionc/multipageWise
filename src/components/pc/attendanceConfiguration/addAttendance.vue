@@ -345,7 +345,7 @@
           }
         }
         axios({
-          url: '/api/mde-person/campus/back/gateAttendanceGroup/add',
+          url: '/mde-person/campus/back/gateAttendanceGroup/add',
           method: 'post',
           data: params,
           headers:{

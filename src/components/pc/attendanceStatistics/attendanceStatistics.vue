@@ -302,7 +302,7 @@ export default {
                 "data": {}
             }
             axios({
-                url: '/api/mde-person/campus/back/organization/queryAllOrg',
+                url: '/mde-person/campus/back/organization/queryAllOrg',
                 method: 'post',
                 data: params,
                 headers:{
@@ -355,7 +355,7 @@ export default {
                 "data": parma
             }
             axios({
-                url: '/api/mde-person/campus/back/gateAttendanceRecord/queryRecordTotals',
+                url: '/mde-person/campus/back/gateAttendanceRecord/queryRecordTotals',
                 method: 'post',
                 data: params,
                 headers:{
@@ -393,7 +393,7 @@ export default {
                 "data": {}
             }
             axios({
-                url: '/api/mde-person/campus/back/gateAttendanceRecord/gateRecordsExport',
+                url: '/mde-person/campus/back/gateAttendanceRecord/gateRecordsExport',
                 method: 'post',
                 data: params,
                 headers:{

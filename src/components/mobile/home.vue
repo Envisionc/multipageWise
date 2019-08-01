@@ -108,25 +108,85 @@ export default {
         normal: 45,
         notLeave: 30,
         total: 1650
-      }
+      },
+      isFrist: true
     }
   },
   components: {
     selectClass
   },
   created() {
-    this.getGateSummary()
+    
   },
   mounted () {
     console.log(window.localStorage.getItem("token"), "token")
+    if (this.isFrist) {
+        this.getLogin()
+        this.isFrist = !this.isFrist
+    }
+    setInterval(() => { this.getLogin() }, 86400000)
+    this.getGateSummary()
   },
   methods: {
+    getLogin() {
+      let requestId = uuid.createUUID()
+      let randomToken = uuid.createUUID()
+      let localHref = window.location.href
+      let newHref = 'https://wisecampus-fat.yoowang.com/p_index.html#/pc_attendance?openAppID=366528156203&objectid=EzQ319HuHN8done&objType=2&userid=nHoIlS9HDYodone&timestamp=1564643606&sign=3E878B018401A60A4D56EAFCC546DCF9'
+      let params = {}
+      if (localHref.indexOf('?') != -1) {
+        let obj = {}
+        let splitArr = []
+        splitArr = localHref.split("?")
+        let littleArr = splitArr[1].split("&")
+        for (let i=0; i<littleArr.length; i++) {
+            let arr = littleArr[i].split("=")
+            obj[arr[0]] = arr[1]
+        }
+        params = {
+          "requestId": requestId,
+          "authToken": randomToken,
+          "userToken": randomToken,
+          "data": {
+              "timestamp": obj.timestamp,
+              "openAppId": "366528156203",
+              "objectId": obj.objectid,
+              "objType": obj.objType,
+              "userId": obj.userid,
+              "sign": obj.sign
+          }
+        }
+      } else {
+        params = {
+          "requestId": requestId,
+          "authToken": randomToken,
+          "userToken": randomToken,
+          "data": {
+              "timestamp": "1564643606",
+              "openAppId": "366528156203",
+              "objectId": "EzQ319HuHN8done",
+              "objType": "2",
+              "userId": "nHoIlS9HDYodone",
+              "sign": "3E878B018401A60A4D56EAFCC546DCF9"
+          }
+        }
+      }
+      api.getLogin(params).then(res => {
+        if (res.code === 0) {
+          const token = res.data.userToken
+          window.localStorage.setItem('Token', token)
+          const Token = window.localStorage.getItem("Token")
+        } else {
+          this.$message.error(res.message)
+        }
+      })
+    },
     updateData() {
       this.getGateSummary()
     },
     getGateSummary() {
       let requestId = uuid.createUUID()
-      let token = window.localStorage.getItem("token")
+      let token = window.localStorage.getItem("Token")
       let params = {
         "requestId": requestId,
         "authToken": token,
@@ -136,12 +196,13 @@ export default {
       api.gateSummary(params).then(res => {
         if (res.code == 0) {
           console.log(res.data, "f返回的结果")
-          // this.gateSummary = res.data
-          this.gateSummary = this.mockData
+          this.gateSummary = res.data
+          // this.gateSummary = this.mockData
           let myChart = echarts.init(document.getElementById('gate-charts'))
           myChart.setOption(this.getOptions(
             ['迟到', "早退", "旷课", '晚未出'],
-            [this.mockData.comeLate, this.mockData.leftEarly, this.mockData.absentee,this.mockData.abnormal, this.mockData.notLeave]
+            [res.data.comeLate, res.data.leftEarly, res.data.absentee,res.data.abnormal, res.data.notLeave]
+            // [this.mockData.comeLate, this.mockData.leftEarly, this.mockData.absentee,this.mockData.abnormal, this.mockData.notLeave]
           ))
         } else {
           this.$message.error(res.message)

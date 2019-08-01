@@ -98,8 +98,8 @@ export default {
                 splitArr = iframeSrc.split("?")
                 let littleArr = splitArr[1].split("&")
                 for (let i=0; i<littleArr.length; i++) {
-                let arr = littleArr[i].split("=")
-                obj[arr[0]] = arr[1]
+                    let arr = littleArr[i].split("=")
+                    obj[arr[0]] = arr[1]
                 }
                 params = {
                 "requestId": requestId,
@@ -108,12 +108,13 @@ export default {
                 "data": {
                     "timestamp": obj.timestamp,
                     "openAppId": obj.openAppId,
-                    "objectId": obj.objectId,
+                    "objectId": obj.objectid,
                     "objType": obj.objType,
-                    "userId": obj.userId,
+                    "userId": obj.userid,
                     "sign": obj.sign
                 }
                 }
+                console.log(params, "pc-----")
             } else {
                 params = {
                     "requestId": requestId,

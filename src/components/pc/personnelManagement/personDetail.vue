@@ -118,7 +118,7 @@ import uuid from '../../../utils/common'
           "data": {}
         }
         axios({
-          url: '/api/mde-person/campus/back/organization/queryAllOrg',
+          url: '/mde-person/campus/back/organization/queryAllOrg',
           method: 'post',
           data: params,
           headers:{
@@ -145,7 +145,7 @@ import uuid from '../../../utils/common'
           }
         }
         axios({
-        url: '/api/mde-person/campus/back/person/queryDetail',
+        url: '/mde-person/campus/back/person/queryDetail',
         method: 'post',
         data: params,
         headers:{
@@ -185,7 +185,7 @@ import uuid from '../../../utils/common'
             "data": {}
           }
           axios({
-            url: '/api/mde-person/campus/back/organization/querySubOrg',
+            url: '/mde-person/campus/back/organization/querySubOrg',
             method: 'post',
             data: params,
             headers:{
@@ -214,7 +214,7 @@ import uuid from '../../../utils/common'
             }
           }
           axios({
-            url: '/api/mde-person/campus/back/organization/querySubOrg',
+            url: '/mde-person/campus/back/organization/querySubOrg',
             method: 'post',
             data: params,
             headers:{

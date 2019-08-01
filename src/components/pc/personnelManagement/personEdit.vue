@@ -78,22 +78,17 @@
       <div class="item-line clearfix">
         <p class="name">人脸识别照片</p>
         <!-- TODO 选择哪种方式上传图片 -->
-        <!-- <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :show-file-list="false"
-          :on-success="handleAvatarSuccess"
-          :before-upload="beforeAvatarUpload">
-          <img v-if="imageUrl" :src="imageUrl" class="avatar">
-          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-        </el-upload> -->
-        <el-upload
-          class="face-upload"
-          action="https://jsonplaceholder.typicode.com/posts/"
-          list-type="picture-card"
-          :on-preview="handlePictureCardPreview"
-          :on-remove="handleRemove">
-          <i class="el-icon-plus"></i>
-        </el-upload>
+        <div class="item picture-box">
+          <div class="face-picture" @mouseenter="pictureEventEnter()">
+            <img :src="facePicture">
+          </div>
+          <div class="layer" v-show="layerShow" @mouseleave="pictureEventLeave()">
+            <div class="fileinput-button">
+              <span class="el-icon-plus edit-pic"></span>
+              <input type="file" multiple="false" id="upload" ref="facePicture" accept="image/*" @change="uploadFile($event)">
+            </div>
+          </div>
+        </div>
       </div>
       <div class="item-line clearfix">
         <p class="name">民族</p>
@@ -260,6 +255,30 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
                 ]
             }
         ],
+        classList: [
+          {
+            name: "小学部",
+            orgId: "106722",
+            subOrg: [
+              {
+                name: "一年级",
+                orgId: "1067222552",
+                subOrg: [
+                  {
+                    name: "一(1)班",
+                    orgId: "10622552562",
+                    subOrg: []
+                  },
+                  {
+                    name: "一(2)班",
+                    orgId: "10622552563",
+                    subOrg: []
+                  }
+                ]
+              }
+            ]
+          }
+        ],
         newprops: {
           label: 'name',
           value: 'orgId',
@@ -272,7 +291,9 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
         imageUrl: '',
         requestId: '', // 请求接口必须参数
         selectMonthYear: '', //入学年月
-        orgOptions: []
+        orgOptions: [],
+        facePicture: '', // 人脸识别照片
+        layerShow: false, //照片遮罩层
       }
     },
     created() {
@@ -283,6 +304,46 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
       this.getTree()
     },
     methods: {
+      pictureEventEnter() {
+        this.layerShow = true
+      },
+      pictureEventLeave() {
+        this.layerShow = false
+      },
+      uploadFile(e) {
+        let file = e.target.files[0]
+        let param = new FormData(); //创建form对象
+        const token = window.localStorage.getItem("token")
+        let requestId = uuid.createUUID()
+        param.append('data',file);//通过append向form对象添加数据 
+        param.append('requestId',requestId);//通过append向form对象添加数据 
+        param.append('authToken',token);//通过append向form对象添加数据 
+        param.append('userToken',token);//通过append向form对象添加数据 
+        param.append('userId',this.id);//通过append向form对象添加数据
+        axios({
+          url: '/mde-person/mde/img/upload',
+          method: 'post',
+          data: param,
+          headers:{
+            'Content-Type':'multipart/form-data'
+          }	
+        }).then(res => {
+          if (res.data.code == 0) {
+            this.$notify({
+              title: '成功',
+              message: '照片上传成功',
+              type: 'success'
+            });
+            this.facePicture = res.data.imageUrl
+            this.getDetail(this.id)
+          } else {
+            this.$notify.error({
+              title: '失败',
+              message: '照片上传失败'
+            });
+          }
+        })
+      },
       // on-success 事件
       handleAvatarSuccess(res, file) {
         this.imageUrl = URL.createObjectURL(file.raw);
@@ -339,7 +400,7 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
           "data": {}
         }
         axios({
-          url: '/api/mde-person/campus/back/organization/queryAllOrg',
+          url: '/mde-person/campus/back/organization/queryAllOrg',
           method: 'post',
           data: params,
           headers:{
@@ -353,6 +414,9 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
               this.options = arr
               this.newOptions(this.options)
               this.orgOptions = this.options
+              // this.classTree = obj.subOrg
+              // this.classTree = this.classList
+              // this.setClassTree()
             } else {
               this.$message.error(res.data.message)
             }
@@ -379,7 +443,7 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
           }
         }
         axios({
-        url: '/api/mde-person/campus/back/person/queryDetail',
+        url: '/mde-person/campus/back/person/queryDetail',
         method: 'post',
         data: params,
         headers:{
@@ -391,10 +455,11 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
             this.id = id
             this.name = obj.name
             this.typeValue = obj.personType
-            this.gender = obj.gender
+            this.gender = (obj.gender).toString()
             this.studentId = obj.personNo
             this.selectMonthYear = obj.entranceYear
             this.phone = obj.phone
+            this.facePicture = obj.imgUrl
             let arrOrgs = obj.orgs
             let str = []
             let newValue = []
@@ -405,12 +470,12 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
               arrOrgs.forEach(item => {
                 newOrgs.name = item.orgName
                 newOrgs.orgId = item.orgId
-                newValue.push(item.orgName)
+                newValue.push(item.orgId)
               })
               str.push(newOrgs)
             }
-            console.log(str, "11111111", newValue.join("/"))
-            this.value = newValue.join("/")
+            console.log(newValue, "11111111", newValue.join("/"))
+            this.value = newValue
             // if (arrOrgs.length > 1) {
               
             //   arrOrgs.forEach(item => {
@@ -446,7 +511,7 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
             "data": {}
           }
           axios({
-            url: '/api/mde-person/campus/back/organization/querySubOrg',
+            url: '/mde-person/campus/back/organization/querySubOrg',
             method: 'post',
             data: params,
             headers:{
@@ -475,7 +540,7 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
             }
           }
           axios({
-            url: '/api/mde-person/campus/back/organization/querySubOrg',
+            url: '/mde-person/campus/back/organization/querySubOrg',
             method: 'post',
             data: params,
             headers:{
@@ -540,7 +605,7 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
             }
           }
           axios({
-            url: '/api/mde-person/campus/back/person/editPerson',
+            url: '/mde-person/campus/back/person/editPerson',
             method: 'post',
             data: params,
             headers:{
@@ -652,6 +717,55 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
   .item-line .item .el-cascader {
     width: 400px;
   }
+  .item.picture-box {
+    position: relative;
+  }
+  .face-picture {
+    width: 120px;
+    height: 120px;
+    border: 1px solid #eee;
+    cursor: pointer;
+  }
+  .face-picture>img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .layer {
+    width: 120px;
+    height: 120px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0, 0.3);
+  }
+  .fileinput-button {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    top: 0px;
+    display: inline-block;
+    overflow: hidden;
+    color: #00a6ed;
+  }
+  .fileinput-button input{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    opacity: 0;
+    cursor: pointer;
+    -ms-filter: 'alpha(opacity=0)';
+  }
+  .edit-pic {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 36px;
+    color: #eee;
+  }
   .red{
     position: relative;
     top: 2px;
@@ -719,5 +833,36 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
     width: 178px;
     height: 178px;
     display: block;
+  }
+  .org-select {
+    margin-top: 10px;
+    height: 160px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+  }
+  .class-select-area {
+    width: 100%;
+    height: 100%;
+  }
+  .class-select-item {
+    float: left;
+    padding-left: 16px;
+    padding-right: 16px;
+    /* padding-bottom: 112px; */
+    overflow-y: auto;
+    width: 33%;
+    height: 100%;
+    border-right: 1px solid #eee;
+  }
+  .class-select-item p {
+    width: auto;
+    font-size: 14px;
+    height: 30px;
+    line-height: 30px;
+    color: #2c3e50;
+  }
+  .class-select-item .active{
+    color: #50bfff;
+    /* font-weight: bold; */
   }
 </style>

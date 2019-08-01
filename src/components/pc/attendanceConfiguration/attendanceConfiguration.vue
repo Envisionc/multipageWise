@@ -121,7 +121,7 @@ const weekMap = {
           "data": {}
         }
         axios({
-          url: '/api/mde-person/campus/back/gateAttendanceGroup/showGroups',
+          url: '/mde-person/campus/back/gateAttendanceGroup/showGroups',
           method: 'post',
           data: params,
           headers:{
@@ -221,7 +221,7 @@ const weekMap = {
             }
           }
           axios({
-            url: '/api/mde-person/campus/back/gateAttendanceGroup/delete',
+            url: '/mde-person/campus/back/gateAttendanceGroup/delete',
             method: 'post',
             data: params,
             headers:{
@@ -277,7 +277,7 @@ const weekMap = {
           }
         }
         axios({
-          url: '/api/mde-person/campus/back/gateAttendanceGroup/queryPersons',
+          url: '/mde-person/campus/back/gateAttendanceGroup/queryPersons',
           method: 'post',
           data: params,
           headers:{

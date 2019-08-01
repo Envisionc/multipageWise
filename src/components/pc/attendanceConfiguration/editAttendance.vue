@@ -274,7 +274,7 @@ import uuid from "../../../utils/common"
           }
         }
         axios({
-          url: '/api/mde-person/campus/back/gateAttendanceGroup/queryPersons',
+          url: '/mde-person/campus/back/gateAttendanceGroup/queryPersons',
           method: 'post',
           data: params,
           headers:{
@@ -309,7 +309,7 @@ import uuid from "../../../utils/common"
           }
         }
         axios({
-          url: '/api/mde-person/campus/back/gateAttendanceGroup/showDetail',
+          url: '/mde-person/campus/back/gateAttendanceGroup/showDetail',
           method: 'post',
           data: params,
           headers:{
@@ -426,7 +426,7 @@ import uuid from "../../../utils/common"
           "data": this.getData()
         }
         axios({
-          url: '/api/mde-person/campus/back/gateAttendanceGroup/update',
+          url: '/mde-person/campus/back/gateAttendanceGroup/update',
           method: 'post',
           data: params,
           headers:{

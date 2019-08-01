@@ -109,7 +109,7 @@ import uuid from '../../../utils/common'
       },  
       getClassTree(){
         let requestId = uuid.createUUID()
-        let token = window.localStorage.getItem("token")
+        let token = window.localStorage.getItem("Token")
         let params = {
           "requestId": requestId,
           "authToken": token,
