@@ -5,7 +5,7 @@
                 <p class="back" @click="back()"><i class="el-icon-back"></i>返回</p>
                 <div class="item-line clearfix">
                     <p class="title"><span>*</span> 管理员姓名：</p>
-                    <div class="label"><el-input v-model="no" class="add-width" @focus="toFocus" placeholder="请输入姓名或学/工号"></el-input></div>
+                    <div class="label"><el-input v-model="personName" class="add-width" @focus="toFocus" placeholder="请输入姓名或学/工号"></el-input></div>
                 </div>
                 <!-- :style="{display:isFocus?'block':'none'}" -->
                 <div class="search-list" :style="{display:isFocus?'block':'none'}">
@@ -58,7 +58,7 @@ export default {
     data () {
         return {
             modalList: [],
-            no: '',
+            personName: '',
             treeData: [
                 {
                     id: 1,
@@ -122,6 +122,7 @@ export default {
             checkNodes: [], //左侧选中的权限
             personId: '', // 人的id
             orgIds: [], //选中的架构id集合
+            orgManagerId: ''
         }
     },
     mounted() {
@@ -129,12 +130,56 @@ export default {
             // var _h = window.innerHeight;
             // var box_h = _h - 180
             $(".el-tree").height(438)
-            this.orgId = this.$route.query.orgId ? this.$route.query.orgId : 0
+            
         })
+        this.orgManagerId = this.$route.query.id ? this.$route.query.id : 0
         this.getTree()
         // this.getInfo()
+        this.getpersonDetail()
     },
     methods: {
+        // 获取详情
+        getpersonDetail() {
+            const token = window.localStorage.getItem("token")
+            let requestId = uuid.createUUID() 
+            console.log(this.orgManagerId,"--")
+            let params = {
+                "requestId": requestId,
+                "authToken": token,
+                "userToken": token,
+                "data": {
+                    "id": this.orgManagerId
+                }
+            }
+            axios({
+                url: '/mde-person/campus/back/person/authority/queryDetail',
+                method: 'post',
+                data: params,
+                headers:{
+                    'Content-Type':'application/json'
+                }	
+            }).then(res => {
+                if (res.data.code == 0) {
+                    let obj = res.data.data
+                    this.personName = obj.personName
+                    let arr = []
+                    console.log(obj.orgs,"-=====")
+                    obj.orgs.forEach(element => {
+                        this.checkNodes.push(element)
+                        this.selectNodes.push(element)
+                        arr.push(element.orgId)
+                    })
+                    this.defaultExpandKeys = arr
+                    this.defaultCheckedKeys = arr
+                    arr.forEach(item => {
+                        this.$refs.tree.setChecked(item,true,false)
+                    })
+                    console.log(this.selectNodes, obj, "详情", this.defaultExpandKeys)
+                } else {
+                    this.$message.error(res.data.message)
+                }
+            })
+        },
         getInfo() {
             const token = window.localStorage.getItem("token")
             let requestId = uuid.createUUID() 

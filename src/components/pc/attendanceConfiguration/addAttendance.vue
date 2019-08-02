@@ -317,8 +317,8 @@
         let schedule = this.schedule;
         for (let date of schedule) {
         arr.push({
-                startTime: DateUtil.format(date[0], 'hh:mm'),
-                endTime: DateUtil.format(date[1], 'hh:mm')
+          startTime: DateUtil.format(date[0], 'hh:mm'),
+          endTime: DateUtil.format(date[1], 'hh:mm')
         })
         }
         return arr;
@@ -353,6 +353,7 @@
           }	
         }).then(res => {
           if (res.data.code == 0) {
+            this.$message.success("保存成功!")
             this.back();
             console.log(res.data.message)
           } else {

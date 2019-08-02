@@ -202,11 +202,11 @@ export default {
             stateOptions: [
                 {
                     value: '0',
-                    label: '迟到'
+                    label: '正常'
                 },
                 {
                     value: '1',
-                    label: '正常'
+                    label: '迟到'
                 },
                 {
                     value: '2',
@@ -256,7 +256,7 @@ export default {
             directionOptions: [
                 {
                     value: '0',
-                    label: '进'
+                    label: '入'
                 },
                 {
                     value: '1',
@@ -283,6 +283,7 @@ export default {
                 children: 'subOrg'
             },
             selectOrgsArr: [], //选择的架构
+            selectLastOrg: [], //最后一个选中的组织
         }
     },
     mounted() {
@@ -333,6 +334,8 @@ export default {
         // 选择组织架构
         handleChange(value) {
             this.selectOrgsArr = value
+            this.selectLastOrg = []
+            this.selectLastOrg.push(value[value.length - 1])
         },
         // 考勤统计-列表展示 查询
         doSearch(page) {
@@ -344,7 +347,7 @@ export default {
             parma["accessType"] = this.directionValue
             parma["acrossStartTime"] = this.passTime[0]
             parma["acrossEndTime"] = this.passTime[1]
-            parma["orgIds"] = this.selectOrgsArr
+            parma["orgIds"] = this.selectLastOrg
             parma["nameOrPersonNo"] = this.no
             parma["pageNo"] = page
             console.log(parma, "参数列表")
@@ -386,12 +389,35 @@ export default {
         doExport() {
             const token = window.localStorage.getItem("token")
             let requestId = uuid.createUUID()
+            let parma = {}
+            if (this.stateValue) {
+                parma["attendanceStatus"] = this.stateValue
+            }
+            if (this.personTypeValue) {
+                parma["personType"] = this.personTypeValue
+            }
+            if (this.directionValue) {
+                parma["accessType"] = this.directionValue
+            }
+            if (this.passTime[0]) {
+                parma["acrossStartTime"] = this.passTime[0]
+            }
+            if (this.passTime[1]) { 
+                parma["acrossEndTime"] = this.passTime[1]
+            }
+            if (this.selectLastOrg.length > 0) {
+                parma["orgIds"] = this.selectLastOrg
+            }
+            if (this.no) {
+                parma["nameOrPersonNo"] = this.no
+            }
             let params = {
                 "requestId": requestId,
                 "authToken": token,
                 "userToken": token,
-                "data": {}
+                "data": parma
             }
+            console.log(params,"p")
             axios({
                 url: '/mde-person/campus/back/gateAttendanceRecord/gateRecordsExport',
                 method: 'post',
@@ -404,9 +430,7 @@ export default {
                 if (res.data.data) {
                     if (res.data.code == 0) {
                         let obj = res.data.data
-                        
                         let header = obj[0]
-                        
                         let body = []
                         for (let i=1; i<obj.length; i++) {
                             body.push(obj[i])
@@ -414,8 +438,13 @@ export default {
                         if (obj.length == 0) {
                             this.$message.error('数据是空的，不能执行导出操作')
                         } else {
-                            util.exportExcelOther(header,body, '人员考勤统计表格')
-                        }
+                            if (body.length == 0) {
+                                util.exportExcelNoBody(header, '人员考勤统计表格')
+                            } else {
+                                util.exportExcelOther(header,body, '人员考勤统计表格')
+                            }
+                        } 
+                        
                     } else {
                         this.$message.error(res.data.message)
                     }

@@ -83,6 +83,7 @@ export default {
       today: '2019-07-30',
       date: new Date(),
       type: 0,
+      orgId: '',
       typeOptions: [
         {
           value: 0,
@@ -116,23 +117,21 @@ export default {
     selectClass
   },
   created() {
-    
-  },
-  mounted () {
-    console.log(window.localStorage.getItem("token"), "token")
     if (this.isFrist) {
         this.getLogin()
         this.isFrist = !this.isFrist
     }
     setInterval(() => { this.getLogin() }, 86400000)
-    this.getGateSummary()
+  },
+  mounted () {
+    
   },
   methods: {
     getLogin() {
       let requestId = uuid.createUUID()
       let randomToken = uuid.createUUID()
       let localHref = window.location.href
-      let newHref = 'https://wisecampus-fat.yoowang.com/p_index.html#/pc_attendance?openAppID=366528156203&objectid=EzQ319HuHN8done&objType=2&userid=nHoIlS9HDYodone&timestamp=1564643606&sign=3E878B018401A60A4D56EAFCC546DCF9'
+      // let newHref = 'https://wisecampus-fat.yoowang.com/p_index.html#/pc_attendance?openAppID=366528156203&objectid=EzQ319HuHN8done&objType=2&userid=nHoIlS9HDYodone&timestamp=1564643606&sign=3E878B018401A60A4D56EAFCC546DCF9'
       let params = {}
       if (localHref.indexOf('?') != -1) {
         let obj = {}
@@ -176,22 +175,38 @@ export default {
           const token = res.data.userToken
           window.localStorage.setItem('Token', token)
           const Token = window.localStorage.getItem("Token")
+          if (Token) {
+            this.getGateSummary()
+          }
         } else {
           this.$message.error(res.message)
         }
       })
     },
     updateData() {
-      this.getGateSummary()
+      let token = window.localStorage.getItem("Token")
+      if (token) {
+        this.getGateSummary()
+      }
+      
     },
     getGateSummary() {
       let requestId = uuid.createUUID()
       let token = window.localStorage.getItem("Token")
+      let orgId
+      let type
+      if (this.orgId) orgId = this.orgId;
+      if (this.type) type = this.type;
+      let date = DateUtil.format(this.date, 'yyyy-MM-dd')
       let params = {
         "requestId": requestId,
         "authToken": token,
         "userToken": token,
-        "data": {}
+        "data": {
+          "orgId": orgId,
+          "type": type,
+          "date": date
+        }
       }
       api.gateSummary(params).then(res => {
         if (res.code == 0) {
@@ -354,7 +369,7 @@ export default {
   margin-bottom: 4.8px;
 }
 .statis-name{
-  width: 60px;
+  width: 48px;
   font-size: 14px;
   display: inline-block;
 }

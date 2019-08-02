@@ -560,7 +560,7 @@ import util from '../../../utils/excelUtil'
         if (this.yearValue !== '') {
           entranceYear = this.yearValue
         }
-        if (this.personType !== '') {
+        if (this.typeValue !== '') {
           personType = this.typeValue
         }
         let orgIds = this.orgId ? [this.orgId] : [];
@@ -585,6 +585,7 @@ import util from '../../../utils/excelUtil'
             console.log(res.data)
             this.personList = res.data.list;
             this.total = res.data.pageBean.rowCount;
+            console.log(this.total, "查询的条数")
             this.pageSize = res.data.pageBean.maxResults
           } else {
             this.$message.error(res.message)
@@ -621,13 +622,22 @@ import util from '../../../utils/excelUtil'
       exportSearch(){
         const token = window.localStorage.getItem("token")
         let requestId = uuid.createUUID()
+        let parma = {}
+        if ( this.typeValue ) {
+          parma["personType"] = this.typeValue
+        }
+        if ( this.no ) {
+          parma["personNameOrPersonNo"] = this.no
+        }
+        if (this.yearValue) {
+          parma["entranceYear"] = this.yearValue
+        }
+        parma["orgId"] = this.orgId
         let params = {
           "requestId": requestId,
           "authToken": token,
           "userToken": token,
-          "data": {
-            "orgId": this.orgId
-          }
+          "data": parma
         }
         axios({
           url: '/mde-person/campus/back/exportPerson',
@@ -639,6 +649,7 @@ import util from '../../../utils/excelUtil'
         }).then(res => {
           if (res.data.code == 0) {
             let obj = res.data.data.list
+            console.log(obj.length, "导出的条数")
             let header = obj[0]
             let body = []
             for (let i=1; i<obj.length; i++) {

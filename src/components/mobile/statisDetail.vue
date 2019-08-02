@@ -279,8 +279,8 @@
         }
         
         console.log(params, "params")
-        api.getQueryRecords(params).then(res => {
-            console.log(res, "-----------")
+        if (token) {
+          api.getQueryRecords(params).then(res => {
             this.loading = false
             this.$refs.myscroller.finishInfinite(2)
             if (res.code == 0) {
@@ -292,7 +292,8 @@
             } else {
               this.$message.error(res.message)
             }
-        })
+          })
+        }
         console.log(page, this.totalPage);
         
         // api.gateList(param).then(data => {

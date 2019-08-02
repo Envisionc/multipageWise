@@ -251,6 +251,7 @@ import uuid from "../../../utils/common"
         this.$router.back();
       } else {
         this.gateDetail(id);
+        this.queryPersons(id)
       }
     },
     computed: {
@@ -260,9 +261,8 @@ import uuid from "../../../utils/common"
       closeDialog() {
         console.log("11111")
       },
-      // 查看适用人员
-      showUsers(page) {
-        this.dialogTableVisible = true
+      // 查询选中人员
+      queryPersons() {
         const token = window.localStorage.getItem("token")
         let requestId = uuid.createUUID()
         let params = {
@@ -270,7 +270,7 @@ import uuid from "../../../utils/common"
           "authToken": token,
           "userToken": token,
           "data": {
-            "id": this.groupId
+            "id": this.id
           }
         }
         axios({
@@ -291,6 +291,11 @@ import uuid from "../../../utils/common"
             this.$message.error(res.data.message)
           }
         })
+      },
+      // 查看适用人员
+      showUsers(page) {
+        this.dialogTableVisible = true
+        
       },
       changePage(page) {
         // console.log(page)

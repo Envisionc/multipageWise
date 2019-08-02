@@ -116,16 +116,19 @@ import uuid from '../../../utils/common'
           "userToken": token,
           "data": {}
         }
-        api.getAllOrg(params).then(res => {
-          console.log(res.data[0])
-          if (res.code == 0) {
-            this.classTree = res.data[0].subOrg
-            // this.classTree = this.classList
-            this.setClassTree()
-          } else {
-            this.$message.error(res.message)
-          }
-        })
+        if (token) {
+          api.getAllOrg(params).then(res => {
+            console.log(res.data[0])
+            if (res.code == 0) {
+              this.classTree = res.data[0].subOrg
+              // this.classTree = this.classList
+              this.setClassTree()
+            } else {
+              this.$message.error(res.message)
+            }
+          })
+        }
+        
         // api.allOrg().then(data => {
         //   if (data.code == 0) {
         //     this.classTree = data.data[0].subOrg;

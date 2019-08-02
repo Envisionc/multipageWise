@@ -117,43 +117,45 @@ let actionMap = {
     },
     methods: {
       detail() {
-            let requestId = uuid.createUUID()
-            let token = window.localStorage.getItem("Token")
-            let params = {
-                "requestId": requestId,
-                "authToken": token,
-                "userToken": token,
-                "data": {
-                    "id": this.id
-                }
+        let requestId = uuid.createUUID()
+        let token = window.localStorage.getItem("Token")
+        let params = {
+            "requestId": requestId,
+            "authToken": token,
+            "userToken": token,
+            "data": {
+                "id": this.id
             }
-        actionMap[this.type](params).then(data => {
-          if (data.code == 0) {
-            this.personNo = data.data.personNo
-            this.accessType = data.data.accessType
-            this.personType = data.data.personType
-            if (this.type == 'dorm') {
-              this.title = data.data.dormRoomName
+        }
+        if (token) {
+          actionMap[this.type](params).then(data => {
+            if (data.code == 0) {
+              this.personNo = data.data.personNo
+              this.accessType = data.data.accessType
+              this.personType = data.data.personType
+              if (this.type == 'dorm') {
+                this.title = data.data.dormRoomName
+              }
+              if (this.type == 'gate' || this.type == 'dorm') {
+                this.name = data.data.name
+                this.clazzName = data.data.clazzName
+                this.attendanceStatus = data.data.attendanceStatus
+                this.recordTime = data.data.recordTime
+                this.personImgUrl = data.data.personImgUrl
+                this.deviceScreenImgUrl = data.data.deviceScreenImgUrl
+                this.title = this.attendanceStatusList[this.type][this.attendanceStatus]
+              } else{
+                this.shootTime = data.data.shootTime
+                this.registerImgUrl = data.data.registerImgUrl
+                this.recordImgUrl = data.data.recordImgUrl
+                this.name = data.data.personName
+                this.title = '食堂考勤记录详情'
+              }
+            } else {
+              this.$message.error(data.message);
             }
-            if (this.type == 'gate' || this.type == 'dorm') {
-              this.name = data.data.name
-              this.clazzName = data.data.clazzName
-              this.attendanceStatus = data.data.attendanceStatus
-              this.recordTime = data.data.recordTime
-              this.personImgUrl = data.data.personImgUrl
-              this.deviceScreenImgUrl = data.data.deviceScreenImgUrl
-              this.title = this.attendanceStatusList[this.type][this.attendanceStatus]
-            } else{
-              this.shootTime = data.data.shootTime
-              this.registerImgUrl = data.data.registerImgUrl
-              this.recordImgUrl = data.data.recordImgUrl
-              this.name = data.data.personName
-              this.title = '食堂考勤记录详情'
-            }
-          } else {
-            this.$message.error(data.message);
-          }
-        })
+          })
+        }
       },
       back() {
         this.$router.go(-1);

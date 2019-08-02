@@ -33,6 +33,8 @@
                             highlight-current
                             lazy
                             :props="defaultProps"
+                            :default-expanded-keys="defaultExpandKeys"
+                            :default-checked-keys="defaultCheckedKeys"
                             @check-change="checkChange">
                         </el-tree>
                     </div>
@@ -125,6 +127,9 @@ export default {
             personId: '', // 人的id
             orgManagerId: '', //选中的架构id集合
             personName: '', //人名
+            defaultExpandKeys: [], //树形控件默认展开的数组
+            defaultCheckedKeys: [],//树形控件默认勾选的数组
+            yes: true
         }
     },
     mounted() {
@@ -161,11 +166,18 @@ export default {
                 if (res.data.code == 0) {
                     let obj = res.data.data
                     this.personName = obj.personName
+                    let arr = []
                     obj.orgs.forEach(element => {
                         this.checkNodes.push(element)
                         this.selectNodes.push(element)
+                        arr.push(element.orgId)
                     })
-                    console.log(this.selectNodes, obj, "详情")
+                    this.defaultExpandKeys = arr
+                    this.defaultCheckedKeys = arr
+                    this.defaultCheckedKeys.forEach(item => {
+                        this.$refs.tree.setChecked(item,true,false)
+                    })
+                    console.log(this.selectNodes, obj, "详情", this.defaultExpandKeys)
                 } else {
                     this.$message.error(res.data.message)
                 }

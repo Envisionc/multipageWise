@@ -147,7 +147,7 @@ export default {
                 }
             }
             axios({
-                url: '/api/mde-person/campus/back/person/searchPerson',
+                url: '/mde-person/campus/back/person/searchPerson',
                 method: 'post',
                 data: params,
                 headers:{
@@ -190,7 +190,7 @@ export default {
                 "data": {}
             }
             axios({
-                url: '/api/mde-person/campus/back/organization/queryAllOrg',
+                url: '/mde-person/campus/back/organization/queryAllOrg',
                 method: 'post',
                 data: params,
                 headers:{
@@ -215,7 +215,7 @@ export default {
                 "data": {}
             }
             axios({
-                url: '/api/mde-person/campus/back/organization/querySubOrg',
+                url: '/mde-person/campus/back/organization/querySubOrg',
                 method: 'post',
                 data: params,
                 headers:{
@@ -244,7 +244,7 @@ export default {
                     }
                 }
                 axios({
-                    url: '/api/mde-person/campus/back/organization/querySubOrg',
+                    url: '/mde-person/campus/back/organization/querySubOrg',
                     method: 'post',
                     data: params,
                     headers:{
@@ -337,7 +337,7 @@ export default {
                 }
             }
             axios({
-                url: '/api/mde-person/campus/back/person/authority/add',
+                url: '/mde-person/campus/back/person/authority/add',
                 method: 'post',
                 data: params,
                 headers:{
