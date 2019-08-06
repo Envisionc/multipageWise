@@ -273,7 +273,8 @@ const weekMap = {
           "authToken": token,
           "userToken": token,
           "data": {
-            "id": id.toString()
+            "id": id,
+            "pageNo": page
           }
         }
         axios({
@@ -287,6 +288,7 @@ const weekMap = {
           if (res.data.code == 0) {
             let obj = res.data.data
             this.gridData = obj.list
+            this.selectId = id
             this.total = obj.pageBean.rowCount
             this.pageSize = obj.pageBean.maxResults
           } else {

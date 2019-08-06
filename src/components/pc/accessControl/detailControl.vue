@@ -11,7 +11,7 @@
                 </div>
                 <!-- :style="{display:isFocus?'block':'none'}" -->
                 <div class="search-list" :style="{display:isFocus?'block':'none'}">
-                    <div class="search-list-item" v-for="(item,index) in modalList" :key="index" @click="addAdmin(item)">
+                    <div class="search-list-item" v-for="(item,index) in modalList" :key="index">
                         <img src="@/assets/img/person-icon.png" class="per-ico" />
                         {{item.name}} -
                         <span>{{item.personNo}}</span>
@@ -35,7 +35,7 @@
                             :props="defaultProps"
                             :default-expanded-keys="defaultExpandKeys"
                             :default-checked-keys="defaultCheckedKeys"
-                            @check-change="checkChange">
+                            >
                         </el-tree>
                     </div>
                     <div class="right-item">
@@ -43,12 +43,12 @@
                         <div class="check-list" ref="selectBox clearfix">
                             <div class="check-item" v-for="(item, index) in selectNodes" :key="index">
                                 {{item.orgName}}
-                                <i @click="delAccess(item, index)" class="el-icon-close"></i>
+                                <!-- <i @click="delAccess(item, index)" class="el-icon-close"></i> -->
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="btn save" @click="save()">保存</div>
+                <!-- <div class="btn save" @click="save()">保存</div> -->
             </div>
             
         </div>
@@ -114,8 +114,10 @@ export default {
                 }
             ],
             defaultProps: {
-                children: 'children',
-                label: 'name'
+                id: 'orgId',
+                children: 'subOrg',
+                label: 'name',
+                disabled: 'disabled'
             },
             checkName: '小新星',
             isFocus: false,
@@ -181,80 +183,7 @@ export default {
                 } else {
                     this.$message.error(res.data.message)
                 }
-        })
-        },
-        getInfo() {
-            const token = window.localStorage.getItem("token")
-            let requestId = uuid.createUUID() 
-            let params = {
-                "requestId": requestId,
-                "authToken": token,
-                "userToken": token,
-                "data": {
-                    "inputText": this.no
-                }
-            }
-            axios({
-                url: '/mde-person/campus/back/person/searchPerson',
-                method: 'post',
-                data: params,
-                headers:{
-                    'Content-Type':'application/json'
-                }	
-            }).then(res => {
-                if (res.data.code == 0) {
-                    let obj = res.data.data
-                    this.modalList = obj.list
-                    this.modalList.forEach(item => {
-                        item.checked = false
-                    })
-                    console.log(obj, "724")
-                } else {
-                    this.$message.error(res.data.message)
-                }
             })
-        },
-        toFocus() {
-            this.isFocus = true
-            const token = window.localStorage.getItem("token")
-            let requestId = uuid.createUUID() 
-            let params = {
-                "requestId": requestId,
-                "authToken": token,
-                "userToken": token,
-                "data": {
-                    "inputText": this.no
-                }
-            }
-            axios({
-                url: '/mde-person/campus/back/person/searchPerson',
-                method: 'post',
-                data: params,
-                headers:{
-                    'Content-Type':'application/json'
-                }	
-            }).then(res => {
-                if (res.data.code == 0) {
-                    let obj = res.data.data
-                    this.modalList = obj.list
-                    this.modalList.forEach(item => {
-                        item.checked = false
-                    })
-                    console.log(obj, "724")
-                } else {
-                    this.$message.error(res.data.message)
-                }
-            })
-        },
-        toBlur() {
-            this.isFocus = false
-        },
-        addAdmin (item) {
-            console.log(item)
-            this.isFocus = false
-            this.no = item.name
-            this.personId = item.id
-            item.checked = true
         },
         back() {
             this.$router.go(-1)
@@ -280,6 +209,15 @@ export default {
                 if (res.statusText === "OK") {
                     console.log("123456789", res.data.data)
                     this.treeDatas = res.data.data
+                    this.treeDatas.forEach((item) => {
+                        item.disabled = false
+                        console.log(item, "--")
+                        if (item.subOrg.length > 0) {
+                            item.subOrg.forEach((element) => {
+                                element.disabled = false
+                            })
+                        }
+                    })
                     this.orgId = res.data.data[0].orgId
                 }
             })

@@ -211,6 +211,7 @@ import uuid from "../../../utils/common"
       changePersonPage(page) {
         this.loadOrgUsers(this.checkedOrgId, page);
       },
+      // 按学号或者名字模糊搜索成员
       searchPerson() {
         let keyword = this.keyword;
         // api.searchPerson(keyword).then(data => {

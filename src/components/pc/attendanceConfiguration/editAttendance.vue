@@ -237,6 +237,7 @@ import uuid from "../../../utils/common"
         page: 1,
         total: 0,
         pageSize: 1,
+        totalRows: 0,
         totalP: 0,
         cachePeople: {},
         totalselPerson: 0,
@@ -251,7 +252,7 @@ import uuid from "../../../utils/common"
         this.$router.back();
       } else {
         this.gateDetail(id);
-        this.queryPersons(id)
+        this.queryPersons(id,1)
       }
     },
     computed: {
@@ -262,7 +263,7 @@ import uuid from "../../../utils/common"
         console.log("11111")
       },
       // 查询选中人员
-      queryPersons() {
+      queryPersons(id,page) {
         const token = window.localStorage.getItem("token")
         let requestId = uuid.createUUID()
         let params = {
@@ -270,7 +271,8 @@ import uuid from "../../../utils/common"
           "authToken": token,
           "userToken": token,
           "data": {
-            "id": this.id
+            "id": id,
+            "pageNo": page
           }
         }
         axios({
@@ -283,7 +285,10 @@ import uuid from "../../../utils/common"
         }).then(res => {
           if (res.data.code == 0) {
             let obj = res.data.data
-            // console.log(obj)
+            console.log(obj)
+            this.total = obj.pageBean.totalPage
+            this.totalRows = obj.pageBean.rowCount
+            this.pageSize = obj.pageBean.maxResults
             if (obj.list) {
               this.selectPerson = obj.list
             }
@@ -299,7 +304,8 @@ import uuid from "../../../utils/common"
       },
       changePage(page) {
         // console.log(page)
-        this.showUsers(page)
+        // this.showUsers(page)
+        this.queryPersons(this.id,page)
       },
       gateDetail(id) {
         this.id = id;
@@ -407,19 +413,6 @@ import uuid from "../../../utils/common"
         return param
       },
       addGate(){
-        if (this.isAjax) return ;
-        let param = this.getData();
-        this.isAjax = true;
-        // api.gateUpdate(param).then(data => {
-        //   if (data.code == 0) {
-        //     this.back();
-        //   } else {
-        //     this.isAjax = false
-        //     this.$message.error(data.message);
-        //   }
-        // })
-      },
-      checkPerson() {
         let param = {};
         const token = window.localStorage.getItem("token")
         let requestId = uuid.createUUID()
@@ -439,33 +432,51 @@ import uuid from "../../../utils/common"
           }	
         }).then(res => {
           if (res.data.code == 0) {
+            this.$message.success("编辑成功!")
             this.back()
           } else {
             this.$message.error(res.data.message)
           }
         })
-        // api.checkGate(this.getData()).then(data => {
-        //   if (data.code==0) {
-        //     if (data.data.length == 0) {
-        //       this.addGate();
-        //     } else {
-        //       let names = [];
-        //       for (let i of data.data) {
-        //         names.push(i.name);
-        //       }
-        //       this.$confirm(names.join(',') + ';以上人员存在时间冲突，是否继续？', '提示', {
-        //         confirmButtonText: '确定',
-        //         cancelButtonText: '取消',
-        //         type: 'warning'
-        //       }).then(()=>{
-        //         this.addGate();
-        //       })
-        //     }
-        //   } else {
-        //     this.$message.error(data.message);
-        //   }
-        // })
       },
+      checkPerson() {
+        let param = {};
+        const token = window.localStorage.getItem("token")
+        let requestId = uuid.createUUID()
+        let params = {
+          "requestId": requestId,
+          "authToken": token,
+          "userToken": token,
+          "data": this.getData()
+        }
+        axios({
+          url: '/mde-person/campus/back/gateAttendanceGroup/checkPersonRepeat',
+          method: 'post',
+          data: params,
+          headers:{
+              'Content-Type':'application/json'
+          }	
+        }).then(res => {
+          console.log(res.data.data.length, "254")
+          if (res.data.code == 0) {
+            if (res.data.data.length == 0) {
+              this.addGate();
+            } else {
+              let names = [];
+              for (let i of res.data.data) {
+                names.push(i.name);
+              }
+              this.$confirm(names.join(',') + ';以上人员存在时间冲突，是否继续？', '提示', {
+                cancelButtonText: '取消',
+                type: 'warning'
+              })
+            }
+          } else {
+            this.$message.error(res.data.message)
+          }
+        })
+      },
+
       getWeek() {
         if (this.inResidence == 1) {
           return JSON.stringify([this.enterValue, this.leaveValue]);

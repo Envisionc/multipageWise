@@ -2,13 +2,15 @@
   <div class="content clearfix">
     <!-- TODO 后续封装组件 -->
     <!-- <leftTree /> -->
-    <div class="sub-list sub-list-bg">
+    <div ref="subList" class="sub-list sub-list-bg">
       <el-tree 
         :data="treeDatas" 
         :load="loadNode" 
         ref="tree"
         lazy 
         :props="defaultProps" 
+        :default-expanded-keys="defaultExpandedKeys"
+        :default-checked-keys="defaultCheckedKeys"
         @node-click="handleNodeClick">
       </el-tree>
     </div>
@@ -298,6 +300,8 @@ import util from '../../../utils/excelUtil'
         orgId: '', //当前节点的id
         dialogTableVisible: false, // 人脸识别照片弹层默认不显示 false
         facePicture: '', // 人脸识别照片
+        defaultExpandedKeys: [], //默认展开的节点
+        defaultCheckedKeys: [], // 默认选中的节点
       }
     },
     mounted() {
@@ -306,11 +310,13 @@ import util from '../../../utils/excelUtil'
         var box_h = _h - 180
         $(".el-tree").height(box_h)
         this.orgId = this.$route.query.orgId ? this.$route.query.orgId : 0
+        // this.$refs.tree.se
         this.search(1)
       })
+      console.log(this.$refs.subList.getBoundingClientRect())
       this.randomToken = uuid.createUUID()
       // this.getPersonList()
-      this.getTree()
+      // this.getTree()
       this.generateYearList()
       // console.log(location.hostname, "location.hostname")
       // this.getInfo()
@@ -383,7 +389,7 @@ import util from '../../../utils/excelUtil'
           "data": {}
         }
         api.getTreeOrg(params).then(res => {
-          console.log(res, "getTreeOrg")
+          
           if (res.code == 0) {
             this.treeDatas = res.data
             this.orgId = res.data[0].orgId
