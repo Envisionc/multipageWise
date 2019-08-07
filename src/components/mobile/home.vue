@@ -10,6 +10,7 @@
                   type="date"
                   @change="updateData"
                   :editable="false"
+                  :clear-icon="el-icon-circle-close"
                   placeholder="">
                 </el-date-picker>
               </div>
@@ -23,7 +24,7 @@
                   </el-option>
                 </el-select>
               </div>
-              <div class="index-class"  @click="changeClassShow()" style="width: 155.2px;">
+              <div class="index-class"  @click="changeClassShow()" style="width: 80px;">
                 {{selectClassName ? selectClassName: '选择班级'}}
                 <!-- <i class="el-icon-arrow-up" v-if="classShow"></i><i class="el-icon-arrow-down" v-else></i> -->
               </div>
@@ -38,26 +39,26 @@
                 <div class="statis-line">
                   <span class="statis-name">迟到</span>
                   <span class="statis-num">{{gateSummary.comeLate}}</span>
-                  <span class="statis-link" @click="linkToStasticDetail(1)"><span>详情</span><i class="el-icon-d-arrow-right"></i></span>
+                  <span class="statis-link" @click="linkToStasticDetail(1)"><i class="el-icon-d-arrow-right"></i></span>
                 </div>
                 <div class="statis-line">
                   <span class="statis-name">早退</span>
                   <span class="statis-num">{{gateSummary.leftEarly}}</span>
-                  <span class="statis-link" @click="linkToStasticDetail(2)"><span>详情</span><i class="el-icon-d-arrow-right"></i></span>
+                  <span class="statis-link" @click="linkToStasticDetail(2)"><i class="el-icon-d-arrow-right"></i></span>
                 </div>
                 <div class="statis-line">
                   <span class="statis-name">旷课</span>
                   <span class="statis-num">{{gateSummary.absentee}}</span>
-                  <span class="statis-link" @click="linkToStasticDetail(5)"><span>详情</span><i class="el-icon-d-arrow-right"></i></span>
+                  <span class="statis-link" @click="linkToStasticDetail(5)"><i class="el-icon-d-arrow-right"></i></span>
                 </div>
                 <div class="statis-line">
                   <span class="statis-name">异常</span>
                   <span class="statis-num">{{gateSummary.abnormal}}</span>
-                  <span class="statis-link" @click="linkToStasticDetail(4)"><span>详情</span><i class="el-icon-d-arrow-right"></i></span>
+                  <span class="statis-link" @click="linkToStasticDetail(4)"><i class="el-icon-d-arrow-right"></i></span>
                 </div>
                 <div class="statis-line"><span class="statis-name">晚未出</span>
                   <span class="statis-num">{{gateSummary.notLeave}}</span>
-                  <span class="statis-link" @click="linkToStasticDetail(6)"><span>详情</span><i class="el-icon-d-arrow-right"></i></span>
+                  <span class="statis-link" @click="linkToStasticDetail(6)"><i class="el-icon-d-arrow-right"></i></span>
                 </div>
               </div>
             </div>
@@ -124,7 +125,7 @@ export default {
     setInterval(() => { this.getLogin() }, 86400000)
   },
   mounted () {
-    
+
   },
   methods: {
     getLogin() {
@@ -253,7 +254,10 @@ export default {
         yAxis : [
           {
             type : 'category',
-            data : ['迟到','早退','旷课','异常','晚未出']
+            data : ['迟到','早退','旷课','异常','晚未出'],
+            axisLabel: {
+              fontSize: 10
+            }
           }
         ],
         xAxis : [
@@ -354,7 +358,7 @@ export default {
 }
 .statis-charts{
   /* flex: 1; */
-  width: 170px;
+  width: 220px;
   height: 200px;
   float: left;
 }
@@ -370,11 +374,12 @@ export default {
 }
 .statis-name{
   width: 48px;
-  font-size: 14px;
+  font-size: 12px;
   display: inline-block;
 }
 .statis-link{
-  font-size: 14px;
+  width: 48px;
+  font-size: 12px;
   color: #5CB85C;
   /* color: #50bfff; */
   font-weight: bold;
@@ -419,12 +424,10 @@ html,body{
 }
 .tab-content {
   display: flex;
+  justify-content: space-between;
 }
 .tab-content .index-timmer .el-input{
-  width: 120px;
-}
-.tab-content .index-timmer .el-input{
-  width: 120px;
+  width: 140px;
 }
 .tab-content .index-timmer .el-input__inner{
   padding: 0 6.4px;
@@ -434,13 +437,13 @@ html,body{
 }
 .tab-content .index-state{
   margin-left: 16px;
-  width: 120px;
+  width: 96px;
   font-size: 19.2px;
 }
 .tab-content .index-state .el-input--suffix .el-input__inner{
   padding: 0 6.4px;
   padding-right: 10px;
-  font-size: 19.2px;
+  font-size: 14px;
 }
 .tab-content .index-class{
   box-sizing: border-box;
@@ -482,7 +485,7 @@ html,body{
 }
 .statis-num{
   display: inline-block;
-  font-size: 14px;
+  font-size: 12px;
   width: 48px;
 }
 .shadow-divide{

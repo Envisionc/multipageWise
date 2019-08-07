@@ -15,7 +15,7 @@
             <p style="text-align:left" v-else >否</p>
           </template>
         </div> -->
-        <template v-if="inResidence == 0">
+        <template>
           <div class="add-line clearfix">
             <p class="add-name">在校时间</p>
             <div class="add-time-block">
@@ -35,53 +35,6 @@
             </div>
           </div>
           <p class="add-time" @click='addTime()'>增加在校时间段</p>
-        </template>
-        <template v-if="inResidence == 1">
-          <div class="add-line clearfix">
-            <p class="add-name">选择入校时间</p>
-            <template>
-              <div class="add-popper fl">
-                <el-select v-model="enterValue" placeholder="请选择">
-                  <el-option
-                    v-for="item in weekOptions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-              </div>
-            </template>
-            <div class="add-timmer fl" style="margin-left: 20px">
-              <el-time-picker
-                v-model="enterTime"
-                :editable='false'
-                format="HH:mm">
-              </el-time-picker>
-            </div>
-          </div>
-          <div class="add-line clearfix">
-            <p class="add-name">选择离校时间</p>
-            <template>
-              <div class="add-popper fl">
-                <el-select v-model="leaveValue" placeholder="请选择">
-                  <el-option
-                    v-for="item in weekOptions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                    >
-                  </el-option>
-                </el-select>
-              </div>
-            </template>
-            <div class="add-timmer fl" style="margin-left: 20px">
-              <el-time-picker
-                v-model="leaveTime"
-                :editable='false'
-                format="HH:mm">
-              </el-time-picker>
-            </div>
-          </div>
         </template>
         <div class="add-line clearfix" v-if="inResidence == 0">
           <p class="add-name">选择日期</p>
@@ -137,7 +90,8 @@
           :current-page="page"
           @current-change="changePage"
           layout="prev, pager, next"
-          :total="total" :page-size="pageSize">
+          :page-count="total"
+          :total="totalRows" :page-size="pageSize">
         </el-pagination>
       </div>
     </el-dialog>
@@ -244,6 +198,7 @@ import uuid from "../../../utils/common"
         selPersonPageSize: 0,
         requestId: '', //必要入参
         groupId: '', //考勤组id
+        isAjax: false,
       }
     },
     created() {
@@ -413,6 +368,7 @@ import uuid from "../../../utils/common"
         return param
       },
       addGate(){
+        if (this.isAjax) return ;
         let param = {};
         const token = window.localStorage.getItem("token")
         let requestId = uuid.createUUID()
@@ -423,6 +379,7 @@ import uuid from "../../../utils/common"
           "userToken": token,
           "data": this.getData()
         }
+        this.isAjax = true;
         axios({
           url: '/mde-person/campus/back/gateAttendanceGroup/update',
           method: 'post',
@@ -435,6 +392,7 @@ import uuid from "../../../utils/common"
             this.$message.success("编辑成功!")
             this.back()
           } else {
+            this.isAjax = false
             this.$message.error(res.data.message)
           }
         })
@@ -467,8 +425,11 @@ import uuid from "../../../utils/common"
                 names.push(i.name);
               }
               this.$confirm(names.join(',') + ';以上人员存在时间冲突，是否继续？', '提示', {
+                confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
+              }).then(()=>{
+                this.addGate();
               })
             }
           } else {

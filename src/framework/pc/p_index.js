@@ -6,6 +6,7 @@ import router from '../../router/pc/index'
 import Element from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import '../../css/common.css'
+import '../../api/pc/index'
 
 Vue.use(Element)
 

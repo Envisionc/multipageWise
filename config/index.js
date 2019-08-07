@@ -3,7 +3,28 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-
+// const express = require('express');
+const axios = require('axios');
+// const router = express.Router();
+const requireFoolWebpack = require('require-fool-webpack')
+const argv = requireFoolWebpack('yargs').argv;
+console.log("-----------", requireFoolWebpack('yargs'))
+if (!argv.s) {
+  var server_url = "https://api-fat.yoowang.com";
+  var post = '7001'
+} else if (argv.s == 'dev') {
+  console.log("-----开发环境-----");
+  var server_url = "https://api-dev.yoowang.com";
+  var post = '7001'
+} else if (argv.s == 'fat') {
+  console.log("-----测试环境-----");
+  var server_url = "https://api-fat.yoowang.com";
+  var post = '7001'
+} else if (argv.s == 'prod') {
+  console.log("-----生产环境-----");
+  var server_url = "https://api.yoowang.com";
+  var post = '7001'
+}
 module.exports = {
   dev: {
 
@@ -12,7 +33,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {  //使用"/api"来代替"
-        target: 'https://api-fat.yoowang.com', //需要访问的地址
+        target: server_url, //需要访问的地址
         changeOrigin: true, //改变源
         secure: false,
         pathRewrite: {
@@ -23,7 +44,7 @@ module.exports = {
 
     // Various Dev Server settings
     host: '0.0.0.0', // can be overwritten by process.env.HOST
-    port: 7001, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
+    port: post, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,
     notifyOnErrors: true,
@@ -81,5 +102,9 @@ module.exports = {
     // `npm run build --report`
     // Set to `true` or `false` to always turn it on or off
     bundleAnalyzerReport: process.env.npm_config_report
-  }
+  },
+  urlData: {
+    server_url: server_url,
+  },
+  axios
 }

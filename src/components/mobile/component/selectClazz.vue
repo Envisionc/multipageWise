@@ -1,13 +1,15 @@
 <template>
-    <div class="class-select" v-show='classShow'>
-      <div class="class-select-area clearfix">
-        <div class="class-select-item" v-for="(classes, index1) in classList" :key="index1">
-          <p v-for="(item, index) in classes" :key="index" @click="selectItem(index, index1, item)" :class="{active: item.check}">{{item.name}}</p>
+    <div class="class-select" v-show='classShow' :style="{height:selectHeight + 'px'}">
+      <div class="select-wrap">
+        <div class="class-select-area clearfix">
+          <div class="class-select-item" v-for="(classes, index1) in classList" :key="index1">
+            <p v-for="(item, index) in classes" :key="index" @click="selectItem(index, index1, item)" :class="{active: item.check}">{{item.name}}</p>
+          </div>
         </div>
-      </div>
-      <div class="class-select-btn clearfix">
-        <div class="reset-btn" @click="resetSelect()">重置</div>
-        <div class="confirm-btn" @click="doSelectItemClass">确定</div>
+        <div class="class-select-btn clearfix">
+          <div class="reset-btn" @click="resetSelect()">重置</div>
+          <div class="confirm-btn" @click="doSelectItemClass">确定</div>
+        </div>
       </div>
     </div>
 </template>
@@ -55,9 +57,11 @@ import uuid from '../../../utils/common'
         hackClass: true,
         orgId: 0,
         className: '',
+        selectHeight: 0
       }
     },
     created() {
+      this.selectHeight = window.screen.height - 60
       this.getClassTree();
     },
     methods: {
@@ -148,9 +152,14 @@ import uuid from '../../../utils/common'
 <style scope>
 .class-select {
   width: 100%;
+  position: absolute;
+  top: 60px;
+  left: 0;
+}
+.select-wrap {
+  width: 100%;
   height: 400px;
   background: #FCFCFC;
-  /* overflow-x: auto; */
   position: fixed;
   top: 72px;
   left: 0;

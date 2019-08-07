@@ -114,7 +114,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       children: true,
       minChunks: 3
     }),
-
+    
     // copy custom static assets
     new CopyWebpackPlugin([
       {

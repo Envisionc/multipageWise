@@ -12,10 +12,10 @@
             @node-click="handleNodeClick"></el-tree>
         </div>
         <div class="add-select-table" style='width: 75%;float: right;max-height: 400px;padding:10px;'>
-          <el-input style="float:left;margin-left:30px;" v-model="keyword" placeholder="姓名/学号" ></el-input>
+          <el-input style="float:left;margin-left:30px;" clearable v-model="keyword" placeholder="姓名/学号" ></el-input>
           <el-button type="success search" @click="searchPerson">搜索</el-button>
           <div class="add-tip">
-            <i class="el-icon-warning"></i>当前已选择<span class="add-selected">{{addSelected}}</span>人,&nbsp;总人数<span>{{totalRows}}人</span>
+            <i class="el-icon-warning"></i>当前已选择<span class="add-selected">{{addSelected}}</span>人,&nbsp;根据架构查询的总人数<span>{{totalRows}}人</span>
           </div>
           <el-checkbox style="float:left;margin-top:10px;" v-model="selectAll" @change="selectAllPerson">全选</el-checkbox>
           <el-table 
@@ -27,7 +27,7 @@
               <template slot-scope="scope">
                 <el-checkbox 
                   v-model="scope.row.checked"
-                  @change="handleSelectionChange(scope.row)"
+                  @change="handleSelectionChange(scope.row, scope.$index)"
                 ></el-checkbox>
               </template>
             </el-table-column>
@@ -45,6 +45,7 @@
               background
               @current-change="changePersonPage"
               :current-page="page"
+              :page-count="pageNums"
               layout="prev, pager, next"
               :total="totalRows" :page-size="pageSize">
             </el-pagination>
@@ -63,9 +64,16 @@
   // import api from '@/api/attendance.js'
 import axios from "axios"
 import uuid from "../../../utils/common"
+import api from '../../../api/pc/index'
   export default {
     name: 'select-person-dlg',
-    props: ["tmpSelectPerson"],
+    // props: ["tmpSelectPerson"],
+    props: {
+      tmpSelectPerson: Array,
+      total:Number, //总条目数
+      pagecount: Number, //总页数
+      pagesize: Number// 页容量
+    },
     data() {
       return {
         keyword: "",
@@ -78,46 +86,73 @@ import uuid from "../../../utils/common"
         gridData: [],
         totalRows: 0,
         pageSize: 0,
+        pageNums: 0,
         cachePeople: {},
         show: false,
         page: 1,
-        selectAll: '',
+        // selectAll: '',
         requestId: '', //必要参数
       }
     },
     watch: {
-      tmpSelectPerson(b, f) {
-        let ids = [];
-        let arr = [];
-        for (let i of f) {
-          arr.push(i.personId);
-          this.cachePeople["" + i.personId] = i;
-        }
-        for (let i=0,len=this.gridData.length; i<len; i++) {
-          if (-1 != $.inArray(this.gridData[i].personId, arr)) {
-            this.gridData[i].checked = true;
-          } else {
-            this.gridData[i].checked = false;
-          }
-        }
-        this.selectPerson = arr
+      // tmpSelectPerson(b, f) {
+      //   console.log(b,f, "b.f")
+      //   this.gridData = b
+      //   let ids = [];
+      //   let arr = [];
+      //   for (let i of f) {
+      //     arr.push(i.personId);
+      //     this.cachePeople["" + i.personId] = i;
+      //   }
+      //   console.log(this.gridData, "watch")
+      //   for (let i=0,len=this.gridData.length; i<len; i++) {
+      //     if (-1 != $.inArray(this.gridData[i].personId, arr)) {
+      //       this.gridData[i].checked = true;
+      //     } else {
+      //       this.gridData[i].checked = false;
+      //     }
+      //   }
+      //   this.selectPerson = arr
+      // },
+      total(o,n) {
+        this.totalRows = o
+        console.log(o,n, "[]")
+      },
+      pagecount(v,l) {
+        this.pageNums = v
+        console.log(v,l, "77")
+      },
+      pagesize(a,b) {
+        this.pageSize = a
+        console.log(a,b, "11")
       }
     },
     computed: {
       addSelected(vm) {
         return vm.selectPerson.length
+      },
+      selectAll(vm) {
+        console.log('aaaa',vm)
+        if (vm.gridData.length == 0) return false 
+        for (let i of vm.gridData){
+          if (!i.checked) {
+            return false
+          }
+        }
+        return true
       }
     },
     created() {
-      
+
     },
     methods: {
       showDlg() {
         this.show = true;
         let arr = [];
         let grid = [];
-        if (this.tmpSelectPerson) {
-          for (let i of this.tmpSelectPerson) {
+        let newArr = JSON.parse(JSON.stringify(this.tmpSelectPerson))
+        if (newArr) {
+          for (let i of newArr) {
             arr.push(i.personId);
             i.checked = true;
             grid.push(i)
@@ -125,6 +160,7 @@ import uuid from "../../../utils/common"
           }
           this.gridData = grid;
           this.selectPerson = arr
+          
         }
       },
 
@@ -187,8 +223,7 @@ import uuid from "../../../utils/common"
         // 查询组织架构所属人员
         this.loadOrgUsers(item.orgId, 1);
       },
-      handleSelectionChange(val) {
-        console.log(val)
+      handleSelectionChange(val, i) {
         if (val.checked) {
           this.cachePeople["" + val.personId].checked = true
           let arr = this.selectPerson;
@@ -196,6 +231,7 @@ import uuid from "../../../utils/common"
           this.selectPerson = [...(new Set(arr))];
           console.log("select!", this.selectPerson)
         } else {
+          console.log(this.gridData, "false")
           this.cachePeople["" + val.personId].checked = false
           let arr = [];
           for (let i of this.selectPerson) {
@@ -209,11 +245,49 @@ import uuid from "../../../utils/common"
       renderRow(data) {
       },
       changePersonPage(page) {
+        console.log(this.checkedOrgId, "xuan")
         this.loadOrgUsers(this.checkedOrgId, page);
       },
       // 按学号或者名字模糊搜索成员
       searchPerson() {
         let keyword = this.keyword;
+        // /mde-person/campus/back/person/searchPerson
+        const token = window.localStorage.getItem("token")
+        let requestId = uuid.createUUID()
+        let params = {
+          "requestId": requestId,
+          "authToken": token,
+          "userToken": token,
+          "data": {
+            "inputText": this.keyword
+          }
+        }
+        api.searchPerson(params).then(res => {
+          if (res.code == 0) {
+            let users = []
+            for (let i of res.data.list) {
+              users.push({
+                  name: i.name, 
+                  checked: $.inArray("" + i.id, this.selectPerson) != -1, 
+                  personId: '' + i.id,
+                  personNo: i.personNo,
+                  orgName: i.org,
+                  type: i.type
+                })
+              this.cachePeople[""+i.id] = {
+                  name: i.name, 
+                  checked: $.inArray("" + i.id, this.selectPerson) != -1, 
+                  personId: '' + i.id,
+                  personNo: i.personNo,
+                  orgName: i.org,
+                  type: i.type
+                }
+            }
+            this.gridData = users;
+            this.totalRows = res.data.list.length
+            this.pageSize = 99999999999
+          }
+        })
         // api.searchPerson(keyword).then(data => {
         //   if (data.code == 0) {
         //     let users = []
@@ -254,7 +328,7 @@ import uuid from "../../../utils/common"
             "pageNo": pageNo
           }
         }
-        axios({
+        axios({ // 查询组织架构所属人员
           url: '/mde-person/campus/back/person/queryPerson',
           method: 'post',
           data: params,
@@ -264,8 +338,6 @@ import uuid from "../../../utils/common"
         }).then(res => {
           if (res.data.code == 0) {
             let obj = res.data.data
-            // this.gridData = obj.list
-            // console.log(obj, "success")
               let users = []
               for (let i of obj.list) {
                 users.push({
