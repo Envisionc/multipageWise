@@ -1,15 +1,6 @@
 import { base_url } from "./base";
 import axios from "axios";
-
-let baseUrl
-console.log(location.hostname, "location.hostname")
-if (location.hostname == 'https://api-fat.yoowang.com') { //测试环境
-    baseUrl = 'https://api-fat.yoowang.com';
-} else if (location.hostname == 'https://api.yoowang.com') { //正式环境
-    baseUrl = 'https://api.yoowang.com';
-} else { //开发环境
-    baseUrl = '/api'
-}
+import {baseUrl} from '../index'
 axios.defaults.baseURL = baseUrl;
 
 //设置超时时间

@@ -115,7 +115,8 @@ export default {
                 }
                 }
                 console.log(params, "pc-----")
-            } else {
+            } 
+            else {
                 params = {
                     "requestId": requestId,
                     "authToken": randomToken,

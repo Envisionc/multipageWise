@@ -457,7 +457,8 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
             this.typeValue = obj.personType
             this.gender = (obj.gender).toString()
             this.studentId = obj.personNo
-            this.selectMonthYear = obj.entranceYear
+            this.selectMonthYear = obj.entranceYear + '年' + obj.entranceMonth + '月'
+            console.log(obj.entranceYear, obj.entranceMonth, "年月")
             this.phone = obj.phone
             this.facePicture = obj.imgUrl
             let arrOrgs = obj.orgs
@@ -574,14 +575,13 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
       },
       // 编辑后提交 2019年02月
       submit() {
+        console.log(this.value, "组织架构数组")
         if (this.value.length == 0) {
           this.$message.error("组织架构不能为空！")
         } else {
           const token = window.localStorage.getItem("token")
           let requestId = uuid.createUUID()
           let orgId = []
-          console.log(this.selectMonthYear)
-          console.log(this.studentId)
           for (let i of this.selectOrgsArr) {
             orgId.push(i)
           }
@@ -601,9 +601,10 @@ import {cityList, hotCity,nationList} from '../../../api/pc/city'
               "idNumber": this.certiNo,
               "cardType": this.certiValue,
               "entranceTime": this.selectMonthYear,
-              "orgId": orgId
+              "orgId": this.value
             }
           }
+          console.log("提交入参", params)
           axios({
             url: '/mde-person/campus/back/person/editPerson',
             method: 'post',

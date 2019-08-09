@@ -335,7 +335,12 @@ export default {
         handleChange(value) {
             this.selectOrgsArr = value
             this.selectLastOrg = []
-            this.selectLastOrg.push(value[value.length - 1])
+            let val = value[value.length - 1]
+            if (!val) {
+                this.selectLastOrg = []
+            } else {
+                this.selectLastOrg.push(val)
+            }
         },
         // 考勤统计-列表展示 查询
         doSearch(page) {
@@ -384,6 +389,7 @@ export default {
             this.directionValue = ''
             this.passTime = ''
             this.no = ''
+            this.selectLastOrg = []
         },
         // 导出
         doExport() {

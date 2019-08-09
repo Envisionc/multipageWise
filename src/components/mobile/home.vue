@@ -10,7 +10,6 @@
                   type="date"
                   @change="updateData"
                   :editable="false"
-                  :clear-icon="el-icon-circle-close"
                   placeholder="">
                 </el-date-picker>
               </div>

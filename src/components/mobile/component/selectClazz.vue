@@ -122,7 +122,6 @@ import uuid from '../../../utils/common'
         }
         if (token) {
           api.getAllOrg(params).then(res => {
-            console.log(res.data[0])
             if (res.code == 0) {
               this.classTree = res.data[0].subOrg
               // this.classTree = this.classList
